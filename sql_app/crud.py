@@ -30,3 +30,10 @@ def remove_song_from_playlist(db: Session, authentication_code: str, song_id: in
                     .delete()
     db.commit()
     return numDeleted
+
+def update_access_token_on_refresh(db: Session, old_access_token: str, new_access_token: str):
+    numUpdated = db.query(models.Playlist)\
+                    .filter(models.Playlist.authentication_code == old_access_token)\
+                    .update({models.Playlist.authentication_code: new_access_token})
+    db.commit()
+    return numUpdated

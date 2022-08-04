@@ -79,7 +79,6 @@ class PrawBot:
         }
         res = requests.get('http://localhost:8000/spotify/authorize/refresh', params=params)
         if res.status_code != 200:
-            print(res.text)
             raise Exception('Unable to refresh expired access token')    
         
         refreshed_token = json.loads(res.text)['access_token']

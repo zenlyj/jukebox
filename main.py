@@ -136,3 +136,10 @@ def remove_song_from_playlist(authentication_code: str, song_id: int, db: Sessio
     return {
         'detail': 'Delete Successful'
     }
+
+@app.put('/playlist/')
+def update_token_code(old_access_token: str, new_access_token: str, db: Session = Depends(get_db)):
+    numUpdated = crud.update_access_token_on_refresh(db, old_access_token, new_access_token)
+    return {
+        'detail': '{x} songs updated'.format(x=numUpdated)
+    }
