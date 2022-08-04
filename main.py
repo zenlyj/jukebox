@@ -51,10 +51,41 @@ def authorize_spotify(authorization_code: str):
         errorMessage = json.loads(result.text)['error_description']
         raise HTTPException(status_code=result.status_code, detail=errorMessage)
     
-    access_token = json.loads(result.text)['access_token']
+    result = json.loads(result.text)
+    access_token = result['access_token']
+    refresh_token = result['refresh_token']
+
+    return {
+        'access_token': access_token,
+        'refresh_token': refresh_token
+    }
+
+@app.get("/spotify/authorize/refresh/")
+def reauthorize_spotify(refresh_token: str):
+    client_id = '3f2c9540f73f41a9961f2e2f86357e18'
+    client_secret = '056631f28de642a48fe6e8a30523b4a7'
+    client_credentials = (client_id + ':' + client_secret).encode('ascii')
+    client_credentials = base64.b64encode(client_credentials)
+    headers = {
+        'Authorization' : 'Basic ' + client_credentials.decode('utf-8'),
+        'Content-Type' : 'application/x-www-form-urlencoded'
+    }
+    data = {
+        'grant_type' : 'refresh_token',
+        'refresh_token' : refresh_token
+    }
+    result = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
+    if result.status_code != 200:
+        errorMessage = json.loads(result.text)['error_description']
+        raise HTTPException(status_code=result.status_code, detail=errorMessage)
+    
+    result = json.loads(result.text)
+    access_token = result['access_token']
+    
     return {
         'access_token': access_token
     }
+
 
 @app.get("/spotify/search/")
 def search_spotify(query: str, query_type: str, access_token: str):

@@ -12,7 +12,6 @@ class Parser:
 
     def parseSpotifySearch(self, result, query):
         result = json.loads(result)
-        print(result)
         return self.getBestResult(result['tracks']['items'], query)
 
     def getBestResult(self, result, query):

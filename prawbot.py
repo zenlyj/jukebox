@@ -42,19 +42,53 @@ class PrawBot:
         print(res.text)
 
     def __get_song_uri(self, title, artist):
+        access_token = self.__get_access_token()
         params = {
-            'query': title + ' ' + artist,
+            'query': self.__sanitize_song_title(title) + ' ' + artist,
             'query_type': 'track',
-            'access_token': self.__get_access_token()
+            'access_token': access_token
         }
         res = requests.get('http://localhost:8000/spotify/search', params=params)
+        
         if res.status_code == 200:
             return json.loads(res.text)['uri']
         else:
+            errorMessage = json.loads(res.text)['detail']
+            print(errorMessage)
+            if errorMessage == 'The access token expired':
+                f = open('spotify_token.json', 'r')
+                refresh_token = json.load(f)['refresh_token']
+                self.__refresh_access_token(refresh_token)
+                self.__get_song_uri(title, artist)
             return None
 
+    def __sanitize_song_title(self, title):
+        title = title.lower()
+        stop_words = ['official music video', 'official video', '(', ')', '[', ']']
+        for word in stop_words:
+            title = title.replace(word, '')
+        return title
+
     def __get_access_token(self):
-        return 'BQBdMOatBuXuibKZojz8K0T0JuaU5fCo74LgW4n5iEFkcjjbM-giMfc9QIcdhHu5OI8Iyq4wIVOv4g2IVew3eQw9oIRAYCCGAQSglFQn7B-0eNdBlgmn1CFbNpiqSV3FvnnQy3JXKTp-GlaYvQSm9-QzSx4FyZqnge7yrxOqlZZqNvuTwsNTciRduT_iiqqz0QpsMIOmS5bMlr-IOpIcZBiiqmJJi2QSy2A'
+        f = open('spotify_token.json', 'r')
+        return json.load(f)['access_token']
+
+    def __refresh_access_token(self, refresh_token):
+        params = {
+            'refresh_token': refresh_token
+        }
+        res = requests.get('http://localhost:8000/spotify/authorize/refresh', params=params)
+        if res.status_code != 200:
+            print(res.text)
+            raise Exception('Unable to refresh expired access token')    
+        
+        refreshed_token = json.loads(res.text)['access_token']
+        updated = {
+            "access_token": refreshed_token,
+            "refresh_token": refresh_token
+        }
+        with open('spotify_token.json', 'w') as outfile:
+            json.dump(updated, outfile)
 
 bot = PrawBot()
 bot.update()
