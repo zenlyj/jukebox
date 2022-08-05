@@ -16,21 +16,22 @@ class Parser:
 
     def getBestResult(self, result, query):
         uri = None
-        difference = float('inf')
+        maxSimilarity = float('-inf')
         for i in range(len(result)):
-            levDist = self.getLevDist(result[i], query)
-            if levDist < difference:
-                difference = levDist
+            similarity = self.similarity(result[i], query)
+            if  similarity > maxSimilarity:
+                maxSimilarity = similarity
                 uri = result[i]['uri']
         return uri
 
-    def getLevDist(self, searchResult, query):
+    def similarity(self, searchResult, query):
         match = ''
         match += searchResult['name']
         for artist in searchResult['artists']:
             match += ' '
             match += artist['name']
             break
-        print(match, query)
-        return jellyfish.levenshtein_distance(match, query)
+        dist = jellyfish.levenshtein_distance(match, query)
+        length = max(len(match), len(query))
+        return float(length - dist) / float(length)
          

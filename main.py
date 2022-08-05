@@ -89,6 +89,7 @@ def reauthorize_spotify(refresh_token: str):
 
 @app.get("/spotify/search/")
 def search_spotify(query: str, query_type: str, access_token: str):
+    print(query)
     url = 'https://api.spotify.com/v1/search'
     params = {
         'q' : query,

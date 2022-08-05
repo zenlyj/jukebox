@@ -21,7 +21,7 @@ class PrawBot:
     
     def __pull(self, subreddit):
         titles = []
-        for submission in self.reddit.subreddit(subreddit).hot(limit=50):
+        for submission in self.reddit.subreddit(subreddit).hot(limit=500):
             titles.append(submission.title)
         return titles
 
@@ -30,6 +30,8 @@ class PrawBot:
         if len(split) != 2: return
         title = split[1]
         artist = split[0]
+        print(self.__sanitize_song_title(title))
+        print(self.__sanitize_song_artist(artist))
         uri = self.__get_song_uri(title, artist)
         print(uri)
         if (uri == None): return
@@ -44,7 +46,7 @@ class PrawBot:
     def __get_song_uri(self, title, artist):
         access_token = self.__get_access_token()
         params = {
-            'query': self.__sanitize_song_title(title) + ' ' + artist,
+            'query': self.__sanitize_song_title(title) + ' ' + self.__sanitize_song_artist(artist),
             'query_type': 'track',
             'access_token': access_token
         }
@@ -64,10 +66,17 @@ class PrawBot:
 
     def __sanitize_song_title(self, title):
         title = title.lower()
-        stop_words = ['official music video', 'official video', '(', ')', '[', ']']
+        stop_words = ['official music video', 'official video', '(', ')', '[', ']', 'produced by', 'feat. ', 'ft. ', 'ft ']
         for word in stop_words:
             title = title.replace(word, '')
         return title
+
+    def __sanitize_song_artist(self, artist):
+        artist = artist.lower()
+        stop_words = ['& ', 'feat. ', 'ft. ', 'ft ', 'x ', '(', ')', '[', ']']
+        for word in stop_words:
+            artist = artist.replace(word, '')
+        return artist
 
     def __get_access_token(self):
         f = open('spotify_token.json', 'r')
