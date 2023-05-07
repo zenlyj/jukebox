@@ -1,6 +1,6 @@
 # Motivation
 
-As an avid fan of hip-hop music, I find myself browsing [r/hiphopheads](https://www.reddit.com/r/hiphopheads/) frequently to discover newly released tracks and albums to listen to. However, the process of sifting through a sea of posts to find related content can be tiresome, not to mention the added step of searching up tracks on Spotify to play them. Hence, Hip Hop Jukebox was developed to automate this mundane process, allowing us to save time and streamline our music discovery-listening.
+As an avid fan of hip-hop music, I find myself browsing [r/hiphopheads](https://www.reddit.com/r/hiphopheads/) frequently to discover newly released tracks and albums to listen to. However, the process of sifting through a sea of posts to find related content can be tiresome, not to mention the added step of searching up tracks on Spotify to play them. Hence, jukebox was developed to automate this mundane process, allowing us to save time and streamline our music discovery-listening.
 
 # Tools and Technologies
 
