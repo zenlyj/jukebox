@@ -15,5 +15,5 @@ class Playlist(Base):
     __tablename__ = "playlist"
 
     id = Column(Integer, primary_key=True, index=True)
-    authentication_code = Column(String)
+    session = Column(String)
     song = Column(Integer, ForeignKey("songs.id"))

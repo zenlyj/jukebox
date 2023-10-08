@@ -17,7 +17,7 @@ class Song(SongBase):
         orm_mode = True
 
 class PlaylistBase(BaseModel):
-    authentication_code: str
+    session: str
     song: int
 
 class PlaylistCreate(PlaylistBase):

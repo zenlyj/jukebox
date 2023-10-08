@@ -2,14 +2,22 @@ import praw
 import requests
 from parser import Parser
 import json
+import os
+from dotenv import load_dotenv
 
 parser = Parser()
+
+load_dotenv()
+CLIENT_URL = os.getenv('CLIENT_URL')
+SERVER_URL = os.getenv('SERVER_URL')
+REDDIT_CLIENT_ID = os.getenv('REDDIT_CLIENT_ID')
+REDDIT_CLIENT_SECRET = os.getenv('REDDIT_CLIENT_SECRET')
 
 class PrawBot:
     def __init__(self):
         self.reddit = praw.Reddit(
-            client_id = "hRpeSArQy1eKxZhwLtZxzg",
-            client_secret = "EG0OUy1b2qfQBM1PYuY5z1gweOsstw",
+            client_id = REDDIT_CLIENT_ID,
+            client_secret = REDDIT_CLIENT_SECRET,
             user_agent = "music_recommendation_bot",
         )
 
@@ -40,7 +48,7 @@ class PrawBot:
             "artist" : artist,
             "uri" : uri
         }
-        res = requests.post('http://localhost:8000/songs/', data=json.dumps(payload))
+        res = requests.post(f"{SERVER_URL}/songs/", data=json.dumps(payload))
         print(res.text)
 
     def __get_song_uri(self, title, artist):
@@ -50,7 +58,7 @@ class PrawBot:
             'query_type': 'track',
             'access_token': access_token
         }
-        res = requests.get('http://localhost:8000/spotify/search', params=params)
+        res = requests.get(f"{SERVER_URL}/spotify/search", params=params)
         
         if res.status_code == 200:
             return json.loads(res.text)['uri']
@@ -86,7 +94,7 @@ class PrawBot:
         params = {
             'refresh_token': refresh_token
         }
-        res = requests.get('http://localhost:8000/spotify/authorize/refresh', params=params)
+        res = requests.get(f"{SERVER_URL}/spotify/authorize/refresh", params=params)
         if res.status_code != 200:
             raise Exception('Unable to refresh expired access token')    
         
