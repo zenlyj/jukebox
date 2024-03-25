@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-function SpotifyAuth(props) {
+function SpotifyAuth() {
   useEffect(() => {
     const SPOTIFY_CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
     const CLIENT_URL = process.env.REACT_APP_CLIENT_URL;

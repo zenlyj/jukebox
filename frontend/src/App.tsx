@@ -1,9 +1,9 @@
 import React from "react";
-import { Routes, Route, Link } from "react-router-dom";
-import Home from "./Home";
-import SpotifyAuth from "./SpotifyAuth";
+import { Routes, Route } from "react-router-dom";
+import Home from "./Home.tsx";
+import SpotifyAuth from "./SpotifyAuth.tsx";
 
-function App(props) {
+function App() {
   return (
     <div>
       <Routes>

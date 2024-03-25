@@ -1,22 +1,29 @@
 import React, { useEffect, useState } from "react";
-import ListContainer from "./ListContainer";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import { deletePlaylistSong, getPlaylist } from "../api/api";
+import { deletePlaylistSong, getPlaylist } from "../api/api.tsx";
 import { Avatar, ListItemAvatar } from "@mui/material";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import MusicList from "./MusicList.tsx";
+import { Song } from "./models/Song.tsx";
 
-function Playlist(props) {
-  const [songs, setSongs] = useState([]);
+interface Props {
+  forceRender: () => void;
+  updatePlaylistURI: (uris: string[]) => void;
+  playSongs: (isPlaying: boolean) => void;
+}
+
+function Playlist(props: Props) {
+  const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
     getPlaylistSongs();
   });
 
-  const getPlaylistSongs = () => {
+  const getPlaylistSongs = (): void => {
     getPlaylist().then((value) =>
-      Promise.resolve(value.json()).then((playlistSongs) => {
+      Promise.resolve(value?.json()).then((playlistSongs: Song[]) => {
         if (
           playlistSongs !== undefined &&
           playlistSongs.length !== songs.length
@@ -28,9 +35,9 @@ function Playlist(props) {
     );
   };
 
-  const removePlaylistSong = (songId) => {
+  const removePlaylistSong = (songId: string): void => {
     deletePlaylistSong(songId).then((response) => {
-      if (response.status == 200) {
+      if (response?.status == 200) {
         props.forceRender();
       } else {
         console.log("Failed to delete");
@@ -38,7 +45,7 @@ function Playlist(props) {
     });
   };
 
-  const listHeader = () => {
+  const listHeader = (): React.JSX.Element => {
     return (
       <ListItem disablePadding>
         <ListItemButton onClick={() => props.playSongs(true)}>
@@ -59,7 +66,7 @@ function Playlist(props) {
   };
 
   return (
-    <ListContainer
+    <MusicList
       listHeader={listHeader()}
       songs={songs}
       onClickHandler={removePlaylistSong}
