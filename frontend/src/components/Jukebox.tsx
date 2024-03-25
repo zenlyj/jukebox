@@ -1,27 +1,32 @@
 import React, { useEffect, useState } from "react";
-import ListContainer from "./ListContainer";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import { getSongs, addSongToPlaylist } from "../api/api";
+import { getSongs, addSongToPlaylist } from "../api/api.tsx";
 import { Avatar, ListItemAvatar } from "@mui/material";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import MusicList from "./MusicList.tsx";
+import { Song } from "./models/Song.tsx";
 
-function Jukebox(props) {
+interface Props {
+  forceRender: () => void;
+}
+
+function Jukebox(props: Props) {
   const modes = ["Latest", "All"];
 
-  const [mode, setMode] = useState(0);
-  const [songs, setSongs] = useState([]);
+  const [mode, setMode] = useState<number>(0);
+  const [songs, setSongs] = useState<Song[]>([]);
 
   useEffect(() => {
     if (songs.length === 0) {
       getSongs().then((value) =>
-        Promise.resolve(value.json()).then((value) => setSongs(value))
+        Promise.resolve(value.json()).then((value: Song[]) => setSongs(value))
       );
     }
   });
 
-  const addToPlaylist = (songId) => {
+  const addToPlaylist = (songId: string): void => {
     addSongToPlaylist(songId).then((response) => {
       if (response.status == 200) {
         props.forceRender();
@@ -31,12 +36,12 @@ function Jukebox(props) {
     });
   };
 
-  const changeMode = () => {
+  const changeMode = (): void => {
     const newMode = (mode + 1) % modes.length;
     setMode(newMode);
   };
 
-  const listHeader = () => {
+  const listHeader = (): React.JSX.Element => {
     return (
       <ListItem disablePadding>
         <ListItemButton onClick={() => changeMode()}>
@@ -57,7 +62,7 @@ function Jukebox(props) {
   };
 
   return (
-    <ListContainer
+    <MusicList
       listHeader={listHeader()}
       songs={songs}
       onClickHandler={addToPlaylist}

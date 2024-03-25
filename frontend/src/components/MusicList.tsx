@@ -1,14 +1,22 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import { Divider } from "@mui/material";
+import { Song } from "./models/Song";
+import Box from "@mui/material/Box";
 
-function MusicList(props) {
-  const listItems = () => {
+interface Props {
+  songs: Song[];
+  listHeader: React.JSX.Element;
+  onClickHandler: (songId: string, songUri: string) => void;
+}
+
+function MusicList(props: Props) {
+  const listItems = (): React.JSX.Element[] => {
     const songs = props.songs;
-    let listItems = [];
+    let listItems: React.JSX.Element[] = [];
     listItems.push(props.listHeader);
 
     if (songs.length === 0) {
@@ -45,7 +53,24 @@ function MusicList(props) {
     return listItems;
   };
 
-  return <List> {listItems()} </List>;
+  return (
+    <Box
+      sx={{
+        width: "100%",
+        height: "100%",
+        bgcolor: "#141414ff",
+        overflow: "auto",
+        "&::-webkit-scrollbar": {
+          backgroundColor: "#141414ff",
+        },
+        "&::-webkit-scrollbar-thumb": {
+          backgroundColor: "#212224ff",
+        },
+      }}
+    >
+      <List> {listItems()} </List>
+    </Box>
+  )
 }
 
 export default MusicList;

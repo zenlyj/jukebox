@@ -1,26 +1,22 @@
 import React, { useEffect, useState } from "react";
 import SpotifyPlayer from "react-spotify-web-playback";
 import { Box } from "@mui/material";
-import AppHeader from "./components/AppHeader";
-import Jukebox from "./components/Jukebox";
-import Playlist from "./components/Playlist";
-import { authorize } from "./api/api";
+import AppHeader from "./components/AppHeader.tsx";
+import Jukebox from "./components/Jukebox.tsx";
+import Playlist from "./components/Playlist.tsx";
+import { authorize } from "./api/api.tsx";
 
 function Home() {
-  const [playlistURI, setPlaylistURI] = useState([]);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [val, setVal] = useState(0);
+  const [playlistURI, setPlaylistURI] = useState<string[]>([]);
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [val, setVal] = useState<number>(0);
 
   useEffect(() => {
     authorize();
   });
 
-  const forceRender = () => {
+  const forceRender = (): void => {
     setVal(val + 1);
-  };
-
-  const updatePlaylistURI = (uris) => {
-    setPlaylistURI(uris);
   };
 
   return (
@@ -44,7 +40,7 @@ function Home() {
         <Box sx={{ flex: 1 }}>
           <Playlist
             playSongs={setIsPlaying}
-            updatePlaylistURI={updatePlaylistURI}
+            updatePlaylistURI={setPlaylistURI}
             forceRender={forceRender}
           />
         </Box>
@@ -52,7 +48,7 @@ function Home() {
       <Box sx={{ flex: 1 }}>
         {sessionStorage.getItem("access_token") !== null && isPlaying ? (
           <SpotifyPlayer
-            token={sessionStorage.getItem("access_token")}
+            token={sessionStorage.getItem("access_token") ?? ""}
             uris={playlistURI}
           />
         ) : (
