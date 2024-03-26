@@ -4,7 +4,12 @@ import { Box } from "@mui/material";
 import AppHeader from "./components/AppHeader.tsx";
 import Jukebox from "./components/Jukebox.tsx";
 import Playlist from "./components/Playlist.tsx";
-import { authorize } from "./api/api.tsx";
+import { authorize, AuthorizeResponse } from "./api/Authorize.tsx";
+import { accessToken, authCode } from "./api/constants.tsx";
+import {
+  refreshAccessToken,
+  RefreshAccessTokenResponse,
+} from "./api/RefreshAccessToken.tsx";
 
 function Home() {
   const [playlistURI, setPlaylistURI] = useState<string[]>([]);
@@ -12,7 +17,24 @@ function Home() {
   const [val, setVal] = useState<number>(0);
 
   useEffect(() => {
-    authorize();
+    const code = authCode();
+    const token = accessToken();
+    if (!token && code) {
+      authorize(code).then((response: AuthorizeResponse) => {
+        if (response.accessToken && response.refreshToken) {
+          sessionStorage.setItem("accessToken", response.accessToken);
+          sessionStorage.setItem("refreshToken", response.refreshToken);
+        }
+      });
+    } else if (token) {
+      refreshAccessToken(token).then((response: RefreshAccessTokenResponse) => {
+        if (response.accessToken) {
+          sessionStorage.setItem("accessToken", response.accessToken);
+        } else {
+          console.log("Unable to refresh access token");
+        }
+      });
+    }
   });
 
   const forceRender = (): void => {
@@ -46,11 +68,8 @@ function Home() {
         </Box>
       </Box>
       <Box sx={{ flex: 1 }}>
-        {sessionStorage.getItem("access_token") !== null && isPlaying ? (
-          <SpotifyPlayer
-            token={sessionStorage.getItem("access_token") ?? ""}
-            uris={playlistURI}
-          />
+        {accessToken() && isPlaying ? (
+          <SpotifyPlayer token={accessToken() ?? ""} uris={playlistURI} />
         ) : (
           <div></div>
         )}

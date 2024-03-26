@@ -61,8 +61,8 @@ def authorize_spotify(authorization_code: str):
     refresh_token = result['refresh_token']
 
     return {
-        'access_token': access_token,
-        'refresh_token': refresh_token
+        'accessToken': access_token,
+        'refreshToken': refresh_token
     }
 
 @app.get("/spotify/authorize/refresh/")
@@ -86,7 +86,7 @@ def reauthorize_spotify(refresh_token: str):
     access_token = result['access_token']
     
     return {
-        'access_token': access_token
+        'accessToken': access_token
     }
 
 
