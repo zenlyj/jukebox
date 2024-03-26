@@ -98,7 +98,7 @@ class PrawBot:
         if res.status_code != 200:
             raise Exception('Unable to refresh expired access token')    
         
-        refreshed_token = json.loads(res.text)['access_token']
+        refreshed_token = json.loads(res.text)['accessToken']
         updated = {
             "access_token": refreshed_token,
             "refresh_token": refresh_token

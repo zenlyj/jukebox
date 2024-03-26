@@ -2,11 +2,15 @@ import React, { useEffect, useState } from "react";
 import ListItem from "@mui/material/ListItem";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
-import { deletePlaylistSong, getPlaylist } from "../api/api.tsx";
 import { Avatar, ListItemAvatar } from "@mui/material";
 import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
 import MusicList from "./MusicList.tsx";
 import { Song } from "./models/Song.tsx";
+import {
+  deletePlaylistSong,
+  DeletePlaylistSongResponse,
+} from "../api/DeletePlaylistSong.tsx";
+import { getPlaylist, GetPlaylistResponse } from "../api/GetPlaylist.tsx";
 
 interface Props {
   forceRender: () => void;
@@ -22,22 +26,17 @@ function Playlist(props: Props) {
   });
 
   const getPlaylistSongs = (): void => {
-    getPlaylist().then((value) =>
-      Promise.resolve(value?.json()).then((playlistSongs: Song[]) => {
-        if (
-          playlistSongs !== undefined &&
-          playlistSongs.length !== songs.length
-        ) {
-          setSongs(playlistSongs);
-          props.updatePlaylistURI(playlistSongs.map((song) => song.uri));
-        }
-      })
-    );
+    getPlaylist().then((response: GetPlaylistResponse) => {
+      if (response.songs.length !== songs.length) {
+        setSongs(response.songs);
+        props.updatePlaylistURI(response.songs.map((song) => song.uri));
+      }
+    });
   };
 
-  const removePlaylistSong = (songId: string): void => {
-    deletePlaylistSong(songId).then((response) => {
-      if (response?.status == 200) {
+  const removePlaylistSong = (songId: number): void => {
+    deletePlaylistSong(songId).then((response: DeletePlaylistSongResponse) => {
+      if (response.isDeleted) {
         props.forceRender();
       } else {
         console.log("Failed to delete");

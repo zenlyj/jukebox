@@ -10,7 +10,7 @@ import Box from "@mui/material/Box";
 interface Props {
   songs: Song[];
   listHeader: React.JSX.Element;
-  onClickHandler: (songId: string, songUri: string) => void;
+  onClickHandler: (songId: number, songUri: string) => void;
 }
 
 function MusicList(props: Props) {
@@ -70,7 +70,7 @@ function MusicList(props: Props) {
     >
       <List> {listItems()} </List>
     </Box>
-  )
+  );
 }
 
 export default MusicList;
