@@ -5,6 +5,7 @@ class Song(Base):
     __tablename__ = "songs"
 
     id = Column(Integer, primary_key=True, index=True)
-    title = Column(String)
-    artist = Column(String)
+    name = Column(String)
     uri = Column(String)
+    album_cover = Column(String)
+    duration = Column(Integer)

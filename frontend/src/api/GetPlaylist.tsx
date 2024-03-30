@@ -1,4 +1,4 @@
-import { Song } from "../components/models/Song";
+import { Song, SongInput, inputToSong } from "../components/models/Song.tsx";
 import { SERVER_URL, accessToken } from "./constants.tsx";
 
 export interface GetPlaylistResponse {
@@ -8,5 +8,7 @@ export interface GetPlaylistResponse {
 export async function getPlaylist(): Promise<GetPlaylistResponse> {
   return fetch(`${SERVER_URL}/playlist/?session=${accessToken()}`)
     .then((response: Response) => (response.ok ? response.json() : []))
-    .then((songs: Song[]) => ({ songs: songs }));
+    .then((inputs: SongInput[]) => ({
+      songs: inputs.map((input) => inputToSong(input)),
+    }));
 }
