@@ -6,6 +6,19 @@ import ListItemText from "@mui/material/ListItemText";
 import { Divider } from "@mui/material";
 import { Song } from "./models/Song";
 import Box from "@mui/material/Box";
+import { Avatar, ListItemAvatar } from "@mui/material";
+
+const formatArtistNames = (artistNames: string[]): string => {
+  return artistNames.join(", ");
+};
+
+const formatDuration = (duration: number): string => {
+  const totalSeconds = duration / 1000;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = Math.floor(totalSeconds - minutes * 60);
+  const formatSeconds = seconds < 10 ? `0${seconds}` : seconds;
+  return `${minutes}:${formatSeconds}`;
+};
 
 interface Props {
   songs: Song[];
@@ -38,11 +51,21 @@ function MusicList(props: Props) {
           <ListItemButton
             onClick={() => props.onClickHandler(song.id, song.uri)}
           >
+            <ListItemAvatar sx={{ paddingRight: "1rem" }}>
+              <img src={song.albumCover} width={50} height={50}></img>
+            </ListItemAvatar>
             <ListItemText
               primary={song.name}
-              secondary={song.artistNames}
+              secondary={formatArtistNames(song.artistNames)}
               primaryTypographyProps={{ color: "#ffffff" }}
               secondaryTypographyProps={{ color: "#a1a1a1ff" }}
+            />
+            <ListItemText
+              secondary={formatDuration(song.duration)}
+              secondaryTypographyProps={{
+                color: "#a1a1a1ff",
+                textAlign: "right",
+              }}
             />
           </ListItemButton>
         </ListItem>
