@@ -40,18 +40,13 @@ class PrawBot:
         artist = split[0]
         print(self.__sanitize_song_title(title))
         print(self.__sanitize_song_artist(artist))
-        uri = self.__get_song_uri(title, artist)
-        print(uri)
-        if (uri == None): return
-        payload = {
-            "title" : title,
-            "artist" : artist,
-            "uri" : uri
-        }
-        res = requests.post(f"{SERVER_URL}/songs/", data=json.dumps(payload))
+        song = self.__search_song(title, artist)
+        print(song)
+        if (song == None): return
+        res = requests.post(f"{SERVER_URL}/songs/", data=json.dumps(song))
         print(res.text)
 
-    def __get_song_uri(self, title, artist):
+    def __search_song(self, title, artist):
         access_token = self.__get_access_token()
         params = {
             'query': self.__sanitize_song_title(title) + ' ' + self.__sanitize_song_artist(artist),
@@ -61,7 +56,7 @@ class PrawBot:
         res = requests.get(f"{SERVER_URL}/spotify/search", params=params)
         
         if res.status_code == 200:
-            return json.loads(res.text)['uri']
+            return json.loads(res.text)
         else:
             errorMessage = json.loads(res.text)['detail']
             print(errorMessage)
@@ -69,7 +64,7 @@ class PrawBot:
                 f = open('spotify_token.json', 'r')
                 refresh_token = json.load(f)['refresh_token']
                 self.__refresh_access_token(refresh_token)
-                self.__get_song_uri(title, artist)
+                self.__search_song(title, artist)
             return None
 
     def __sanitize_song_title(self, title):

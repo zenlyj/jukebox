@@ -1,9 +1,12 @@
 from pydantic import BaseModel
+from typing import List
 
 class SongBase(BaseModel):
-    title: str
-    artist: str
+    name: str
+    artist_names: List[str]
     uri: str
+    album_cover: str
+    duration: int
 
 class SongCreate(SongBase):
     pass

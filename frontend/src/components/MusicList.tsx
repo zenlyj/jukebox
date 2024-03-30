@@ -39,8 +39,8 @@ function MusicList(props: Props) {
             onClick={() => props.onClickHandler(song.id, song.uri)}
           >
             <ListItemText
-              primary={song.title}
-              secondary={song.artist}
+              primary={song.name}
+              secondary={song.artistNames}
               primaryTypographyProps={{ color: "#ffffff" }}
               secondaryTypographyProps={{ color: "#a1a1a1ff" }}
             />

@@ -15,14 +15,18 @@ class Parser:
         return self.getBestResult(result['tracks']['items'], query)
 
     def getBestResult(self, result, query):
-        uri = None
+        name, artist_names, uri, album_cover, duration = None, None, None, None, None
         maxSimilarity = float('-inf')
         for i in range(len(result)):
             similarity = self.similarity(result[i], query)
             if  similarity > maxSimilarity:
                 maxSimilarity = similarity
+                name = result[i]['name']
+                artist_names = [artist['name'] for artist in result[i]['artists']]
                 uri = result[i]['uri']
-        return uri
+                album_cover = result[i]['album']['images'][0]['url']
+                duration = result[i]['duration_ms']
+        return name, artist_names, uri, album_cover, duration
 
     def similarity(self, searchResult, query):
         match = ''

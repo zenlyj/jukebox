@@ -84,9 +84,13 @@ def search_spotify(query: str, query_type: str, access_token: str):
     if result.status_code != 200:
         errorMessage = json.loads(result.text)['error']['message']
         raise HTTPException(status_code=result.status_code, detail=errorMessage)
-    uri = parser.parseSpotifySearch(result.text, query)
+    name, artist_names, uri, album_cover, duration = parser.parseSpotifySearch(result.text, query)
     if uri == None:
         raise HTTPException(status_code=404, detail='Track not found on Spotify')
     return {
-        'uri' : uri
+        'name' : name,
+        'artist_names' : artist_names,
+        'uri' : uri,
+        'album_cover' : album_cover,
+        'duration' : duration
     }
