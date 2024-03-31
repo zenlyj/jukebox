@@ -1,21 +1,15 @@
 import React, { useEffect, useState } from "react";
-import SpotifyPlayer from "react-spotify-web-playback";
 import { Box } from "@mui/material";
 import AppHeader from "./components/AppHeader.tsx";
-import Jukebox from "./components/Jukebox.tsx";
-import Playlist from "./components/Playlist.tsx";
 import { authorize, AuthorizeResponse } from "./api/Authorize.tsx";
 import { accessToken, authCode } from "./api/constants.tsx";
 import {
   refreshAccessToken,
   RefreshAccessTokenResponse,
 } from "./api/RefreshAccessToken.tsx";
+import { Outlet } from "react-router-dom";
 
 function Home() {
-  const [playlistURI, setPlaylistURI] = useState<string[]>([]);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
-  const [val, setVal] = useState<number>(0);
-
   useEffect(() => {
     const code = authCode();
     const token = accessToken();
@@ -37,10 +31,6 @@ function Home() {
     }
   });
 
-  const forceRender = (): void => {
-    setVal(val + 1);
-  };
-
   return (
     <Box
       sx={{
@@ -53,26 +43,8 @@ function Home() {
       <Box sx={{ flex: 1 }}>
         <AppHeader />
       </Box>
-      <Box
-        sx={{ flex: 8, display: "flex", flexDirection: "row", height: "85vh" }}
-      >
-        <Box sx={{ flex: 1 }}>
-          <Jukebox forceRender={forceRender} />
-        </Box>
-        <Box sx={{ flex: 1 }}>
-          <Playlist
-            playSongs={setIsPlaying}
-            updatePlaylistURI={setPlaylistURI}
-            forceRender={forceRender}
-          />
-        </Box>
-      </Box>
-      <Box sx={{ flex: 1 }}>
-        {accessToken() && isPlaying ? (
-          <SpotifyPlayer token={accessToken() ?? ""} uris={playlistURI} />
-        ) : (
-          <div></div>
-        )}
+      <Box sx={{ flex: 9, height: "85vh" }}>
+        <Outlet />
       </Box>
     </Box>
   );

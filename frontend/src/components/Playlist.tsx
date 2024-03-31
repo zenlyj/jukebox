@@ -1,9 +1,5 @@
 import React, { useEffect, useState } from "react";
-import ListItem from "@mui/material/ListItem";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemText from "@mui/material/ListItemText";
-import { Avatar, ListItemAvatar } from "@mui/material";
-import PlaylistPlayIcon from "@mui/icons-material/PlaylistPlay";
+import { Box } from "@mui/material";
 import MusicList from "./MusicList.tsx";
 import { Song } from "./models/Song.tsx";
 import {
@@ -11,15 +7,12 @@ import {
   DeletePlaylistSongResponse,
 } from "../api/DeletePlaylistSong.tsx";
 import { getPlaylist, GetPlaylistResponse } from "../api/GetPlaylist.tsx";
+import SpotifyPlayer from "react-spotify-web-playback";
+import { accessToken } from "../api/constants.tsx";
 
-interface Props {
-  forceRender: () => void;
-  updatePlaylistURI: (uris: string[]) => void;
-  playSongs: (isPlaying: boolean) => void;
-}
-
-function Playlist(props: Props) {
+function Playlist() {
   const [songs, setSongs] = useState<Song[]>([]);
+  const [uris, setUris] = useState<string[]>([]);
 
   useEffect(() => {
     getPlaylistSongs();
@@ -29,7 +22,7 @@ function Playlist(props: Props) {
     getPlaylist().then((response: GetPlaylistResponse) => {
       if (response.songs.length !== songs.length) {
         setSongs(response.songs);
-        props.updatePlaylistURI(response.songs.map((song) => song.uri));
+        setUris(response.songs.map((song) => song.uri));
       }
     });
   };
@@ -37,39 +30,19 @@ function Playlist(props: Props) {
   const removePlaylistSong = (songId: number): void => {
     deletePlaylistSong(songId).then((response: DeletePlaylistSongResponse) => {
       if (response.isDeleted) {
-        props.forceRender();
+        console.log("Successfully removed song from playlist");
+        getPlaylistSongs();
       } else {
         console.log("Failed to delete");
       }
     });
   };
 
-  const listHeader = (): React.JSX.Element => {
-    return (
-      <ListItem disablePadding>
-        <ListItemButton onClick={() => props.playSongs(true)}>
-          <ListItemAvatar>
-            <Avatar>
-              <PlaylistPlayIcon />
-            </Avatar>
-          </ListItemAvatar>
-          <ListItemText
-            primary="Playlist"
-            secondary="Listen on Spotify"
-            primaryTypographyProps={{ color: "#ffffff" }}
-            secondaryTypographyProps={{ color: "#a1a1a1ff" }}
-          />
-        </ListItemButton>
-      </ListItem>
-    );
-  };
-
   return (
-    <MusicList
-      listHeader={listHeader()}
-      songs={songs}
-      onClickHandler={removePlaylistSong}
-    />
+    <Box>
+      <MusicList songs={songs} onClickHandler={removePlaylistSong} />
+      <SpotifyPlayer token={accessToken() ?? ""} uris={uris} />
+    </Box>
   );
 }
 
