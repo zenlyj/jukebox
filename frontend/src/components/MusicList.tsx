@@ -6,7 +6,7 @@ import ListItemText from "@mui/material/ListItemText";
 import { Divider } from "@mui/material";
 import { Song } from "./models/Song";
 import Box from "@mui/material/Box";
-import { Avatar, ListItemAvatar } from "@mui/material";
+import { ListItemAvatar } from "@mui/material";
 
 const formatArtistNames = (artistNames: string[]): string => {
   return artistNames.join(", ");
@@ -22,15 +22,13 @@ const formatDuration = (duration: number): string => {
 
 interface Props {
   songs: Song[];
-  listHeader: React.JSX.Element;
   onClickHandler: (songId: number, songUri: string) => void;
 }
 
 function MusicList(props: Props) {
   const listItems = (): React.JSX.Element[] => {
     const songs = props.songs;
-    let listItems: React.JSX.Element[] = [];
-    listItems.push(props.listHeader);
+    const listItems: React.JSX.Element[] = [];
 
     if (songs.length === 0) {
       listItems.push(

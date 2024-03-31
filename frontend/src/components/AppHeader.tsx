@@ -2,25 +2,35 @@ import * as React from "react";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import IconButton from "@mui/material/IconButton";
-import HeadphonesIcon from "@mui/icons-material/Headphones";
+import { Button } from "@mui/material";
+import { Link } from "react-router-dom";
+
+const buttonStyle = {
+  textTransform: "none",
+  color: "#ffffff",
+};
 
 function AppHeader() {
   return (
     <AppBar position="fixed" sx={{ bgcolor: "#000000" }}>
       <Toolbar>
-        <IconButton
-          size="large"
-          edge="start"
-          color="inherit"
-          aria-label="menu"
-          sx={{ mr: 2 }}
-        >
-          <HeadphonesIcon />
-        </IconButton>
-        <Typography variant="h6" component="span" sx={{ flexGrow: 1 }}>
+        <Typography variant="h6" component="span">
           jukebox.
         </Typography>
+        <Button
+          component={Link}
+          to="/home/discover"
+          sx={{ marginLeft: "2em", ...buttonStyle }}
+        >
+          <Typography variant="h6" component="span">
+            discover
+          </Typography>
+        </Button>
+        <Button component={Link} to="/home/listen" sx={buttonStyle}>
+          <Typography variant="h6" component="span">
+            listen
+          </Typography>
+        </Button>
         <Typography
           variant="h6"
           component="span"

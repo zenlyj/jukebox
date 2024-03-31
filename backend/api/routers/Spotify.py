@@ -25,7 +25,7 @@ def authorize_spotify(authorization_code: str):
     data = {
         'grant_type' : 'authorization_code',
         'code' : authorization_code,
-        'redirect_uri' : f"{CLIENT_URL}/home/"
+        'redirect_uri' : f"{CLIENT_URL}/home/discover"
     }
     result = requests.post('https://accounts.spotify.com/api/token', headers=headers, data=data)
     if result.status_code != 200:
