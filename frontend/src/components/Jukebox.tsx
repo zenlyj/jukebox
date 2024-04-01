@@ -6,9 +6,13 @@ import {
   addSongToPlaylist,
   AddSongToPlaylistResponse,
 } from "../api/AddSongToPlaylist.tsx";
+import { useOutletContext } from "react-router-dom";
+import { PlaylistSizeContext } from "./models/PlaylistSizeContext.tsx";
 
 function Jukebox() {
   const [songs, setSongs] = useState<Song[]>([]);
+  const { playlistSize, setPlaylistSize } =
+    useOutletContext<PlaylistSizeContext>();
 
   useEffect(() => {
     if (songs.length === 0) {
@@ -22,6 +26,7 @@ function Jukebox() {
     addSongToPlaylist(songId).then((response: AddSongToPlaylistResponse) => {
       if (response.isAdded) {
         console.log("Successfully added to playlist");
+        setPlaylistSize(playlistSize + 1);
       } else {
         console.log("Failed to add to playlist");
       }
