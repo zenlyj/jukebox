@@ -8,8 +8,11 @@ import {
   RefreshAccessTokenResponse,
 } from "./api/RefreshAccessToken.tsx";
 import { Outlet } from "react-router-dom";
+import { GetPlaylistResponse, getPlaylist } from "./api/GetPlaylist.tsx";
 
 function Home() {
+  const [playlistSize, setPlaylistSize] = useState<number>(0);
+
   useEffect(() => {
     const code = authCode();
     const token = accessToken();
@@ -29,6 +32,13 @@ function Home() {
         }
       });
     }
+    if (playlistSize === 0) {
+      getPlaylist().then((response: GetPlaylistResponse) => {
+        if (response.songs.length !== playlistSize) {
+          setPlaylistSize(response.songs.length);
+        }
+      });
+    }
   });
 
   return (
@@ -41,10 +51,15 @@ function Home() {
       }}
     >
       <Box sx={{ flex: 1 }}>
-        <AppHeader />
+        <AppHeader playlistSize={playlistSize} />
       </Box>
       <Box sx={{ flex: 9, height: "85vh" }}>
-        <Outlet />
+        <Outlet
+          context={{
+            playlistSize: playlistSize,
+            setPlaylistSize: setPlaylistSize,
+          }}
+        />
       </Box>
     </Box>
   );
