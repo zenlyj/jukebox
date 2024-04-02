@@ -14,7 +14,7 @@ def get_playlist_songs(db: Session, session: str):
     for song in songs:
         artists = db.query(Artist).filter(Artist.song_id == song.id).all()
         artist_names = [artist.name for artist in artists]
-        res.append(song_schemas.Song(id=song.id, name=song.name, artist_names=artist_names, uri=song.uri, album_cover=song.album_cover, duration=song.duration))
+        res.append(song_schemas.Song(id=song.id, name=song.name, artist_names=artist_names, uri=song.uri, album_cover=song.album_cover, duration=song.duration, spotify_id=song.spotify_id))
     return res
 
 def add_song_to_playlist(db: Session, playlist: playlist_schemas.PlaylistCreate):

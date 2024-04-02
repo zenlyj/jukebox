@@ -26,7 +26,8 @@ class Parser:
                 uri = result[i]['uri']
                 album_cover = result[i]['album']['images'][0]['url']
                 duration = result[i]['duration_ms']
-        return name, artist_names, uri, album_cover, duration
+                spotify_id = result[i]['id']
+        return name, artist_names, uri, album_cover, duration, spotify_id
 
     def similarity(self, searchResult, query):
         match = ''
