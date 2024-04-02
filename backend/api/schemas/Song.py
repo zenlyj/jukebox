@@ -7,6 +7,7 @@ class SongBase(BaseModel):
     uri: str
     album_cover: str
     duration: int
+    spotify_id: str
 
 class SongCreate(SongBase):
     pass
