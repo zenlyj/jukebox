@@ -6,7 +6,9 @@ from ..models.Song import Song
 from ..models.Artist import Artist
 from ..models.Playlist import Playlist
 
-def get_playlist_songs(db: Session, session: str):
+from typing import List
+
+def get_playlist_songs(db: Session, session: str) -> List[song_schemas.Song]:
     songs = db.query(Song)\
         .join(Playlist, Song.id == Playlist.song and Playlist.session == session)\
         .all()
@@ -17,21 +19,21 @@ def get_playlist_songs(db: Session, session: str):
         res.append(song_schemas.Song(id=song.id, name=song.name, artist_names=artist_names, uri=song.uri, album_cover=song.album_cover, duration=song.duration, spotify_id=song.spotify_id))
     return res
 
-def add_song_to_playlist(db: Session, playlist: playlist_schemas.PlaylistCreate):
+def add_song_to_playlist(db: Session, playlist: playlist_schemas.PlaylistCreate) -> playlist_schemas.Playlist:
     playlist_song = Playlist(session=playlist.session, song=playlist.song)
     db.add(playlist_song)
     db.commit()
     db.refresh(playlist_song)
-    return playlist_song
+    return playlist_schemas.Playlist(id=playlist_song.id, session=playlist_song.session, song=playlist_song.song)
 
-def remove_song_from_playlist(db: Session, session: str, song_id: int):
+def remove_song_from_playlist(db: Session, session: str, song_id: int) -> int:
     num_deleted = db.query(Playlist)\
                     .filter(Playlist.song == song_id and Playlist.session == session)\
                     .delete()
     db.commit()
     return num_deleted
 
-def update_access_token_on_refresh(db: Session, old_access_token: str, new_access_token: str):
+def update_access_token_on_refresh(db: Session, old_access_token: str, new_access_token: str) -> int:
     num_updated = db.query(Playlist)\
                     .filter(Playlist.session == old_access_token)\
                     .update({Playlist.session: new_access_token})

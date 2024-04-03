@@ -1,4 +1,4 @@
-import { SERVER_URL, refreshToken } from "./constants.tsx";
+import { SERVER_URL, accessToken, refreshToken } from "./constants.tsx";
 
 const isAccessTokenExpired = async (accessToken: string): Promise<boolean> => {
   return fetch(
@@ -12,6 +12,14 @@ const isAccessTokenExpired = async (accessToken: string): Promise<boolean> => {
     .then((response) => (response.status !== 200 ? response.json() : null))
     .then((response) => !!(response?.detail === "The access token expired"));
 };
+
+interface ServerResponse {
+  access_token: string | null;
+}
+
+const mapResponse = (response: ServerResponse) => ({
+  accessToken: response.access_token,
+});
 
 export interface RefreshAccessTokenResponse {
   accessToken: string | null;
@@ -30,8 +38,10 @@ export async function refreshAccessToken(
     if (!isExpired) {
       return { accessToken: accessToken };
     }
-    return fetch(url).then((response: Response) =>
-      response.ok ? response.json() : { accessToken: null }
-    );
+    return fetch(url)
+      .then((response: Response) =>
+        response.ok ? response.json() : { access_token: null }
+      )
+      .then((response: ServerResponse) => mapResponse(response));
   });
 }

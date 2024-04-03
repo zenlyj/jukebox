@@ -4,7 +4,9 @@ from ..schemas import Song as song_schemas
 from ..models.Song import Song
 from ..models.Artist import Artist
 
-def get_songs(db: Session, skip: int = 0, limit: int = 100):
+from typing import List
+
+def get_songs(db: Session, skip: int = 0, limit: int = 100) -> List[song_schemas.Song]:
     songs = db.query(Song).offset(skip).limit(limit).all()
     res = []
     for song in songs:
@@ -13,7 +15,7 @@ def get_songs(db: Session, skip: int = 0, limit: int = 100):
         res.append(song_schemas.Song(id=song.id, name=song.name, artist_names=artist_names, uri=song.uri, album_cover=song.album_cover, duration=song.duration, spotify_id=song.spotify_id))
     return res
 
-def create_song(db: Session, song: song_schemas.SongCreate):
+def create_song(db: Session, song: song_schemas.SongCreate) -> song_schemas.Song:
     new_song = Song(name=song.name, uri=song.uri, album_cover=song.album_cover, duration=song.duration, spotify_id=song.spotify_id)
     db.add(new_song)
     db.commit()
