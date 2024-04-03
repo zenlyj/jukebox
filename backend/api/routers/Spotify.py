@@ -6,6 +6,11 @@ import base64
 import json
 import os
 
+from ..models.responses.SpotifyResponse import AuthorizeSpotifyResponse
+from ..models.responses.SpotifyResponse import to_authorize_spotify_response
+from ..models.responses.SpotifyResponse import ReauthorizeSpotifyResponse
+from ..models.responses.SpotifyResponse import to_reauthorize_spotify_response
+
 load_dotenv()
 CLIENT_URL = os.getenv('CLIENT_URL')
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
@@ -14,7 +19,7 @@ SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 parser = Parser()
 router = APIRouter()
 
-@router.get("/spotify/authorize/")
+@router.get("/spotify/authorize/", response_model=AuthorizeSpotifyResponse)
 def authorize_spotify(authorization_code: str):
     client_credentials = (SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET).encode('ascii')
     client_credentials = base64.b64encode(client_credentials)
@@ -36,12 +41,9 @@ def authorize_spotify(authorization_code: str):
     access_token = result['access_token']
     refresh_token = result['refresh_token']
 
-    return {
-        'accessToken': access_token,
-        'refreshToken': refresh_token
-    }
+    return to_authorize_spotify_response(access_token, refresh_token)
 
-@router.get("/spotify/authorize/refresh/")
+@router.get("/spotify/authorize/refresh/", response_model=ReauthorizeSpotifyResponse)
 def reauthorize_spotify(refresh_token: str):
     client_credentials = (SPOTIFY_CLIENT_ID + ':' + SPOTIFY_CLIENT_SECRET).encode('ascii')
     client_credentials = base64.b64encode(client_credentials)
@@ -61,9 +63,7 @@ def reauthorize_spotify(refresh_token: str):
     result = json.loads(result.text)
     access_token = result['access_token']
     
-    return {
-        'accessToken': access_token
-    }
+    return to_reauthorize_spotify_response(access_token)
 
 
 @router.get("/spotify/search/")

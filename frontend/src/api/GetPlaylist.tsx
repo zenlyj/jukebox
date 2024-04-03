@@ -6,7 +6,7 @@ export interface GetPlaylistResponse {
 }
 
 export async function getPlaylist(): Promise<GetPlaylistResponse> {
-  return fetch(`${SERVER_URL}/playlist/?session=${accessToken()}`)
+  return fetch(`${SERVER_URL}/playlist/${accessToken()}`)
     .then((response: Response) => (response.ok ? response.json() : []))
     .then((inputs: SongInput[]) => ({
       songs: inputs.map((input) => inputToSong(input)),
