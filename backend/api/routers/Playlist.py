@@ -1,17 +1,17 @@
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from api.database import SessionLocal
-from api.schemas import Playlist as playlist_schemas
+from api.schemas.Playlist import PlaylistCreate
 from api.repositories import PlaylistRepository as playlist_repository
 from typing import List
-from ..models.responses.SongResponse import GetSongResponse
-from ..models.responses.SongResponse import to_get_song_response
-from ..models.responses.PlaylistResponse import AddSongToPlaylistResponse
-from ..models.responses.PlaylistResponse import to_add_song_to_playlist_response
-from ..models.responses.PlaylistResponse import DeleteSongFromPlaylistResponse
-from ..models.responses.PlaylistResponse import to_delete_song_from_playlist_response
-from ..models.responses.PlaylistResponse import UpdateTokenCodeResponse
-from ..models.responses.PlaylistResponse import to_update_token_code_response
+from ..responses.SongResponse import GetSongResponse
+from ..responses.SongResponse import to_get_song_response
+from ..responses.PlaylistResponse import AddSongToPlaylistResponse
+from ..responses.PlaylistResponse import to_add_song_to_playlist_response
+from ..responses.PlaylistResponse import DeleteSongFromPlaylistResponse
+from ..responses.PlaylistResponse import to_delete_song_from_playlist_response
+from ..responses.PlaylistResponse import UpdateTokenCodeResponse
+from ..responses.PlaylistResponse import to_update_token_code_response
 
 def get_db():
     db = SessionLocal()
@@ -27,7 +27,7 @@ def get_playlist_songs(session: str, db: Session = Depends(get_db)):
     return [to_get_song_response(song) for song in playlist_repository.get_playlist_songs(db, session)]
 
 @router.post("/playlist/", response_model=AddSongToPlaylistResponse)
-def add_song_to_playlist(playlist: playlist_schemas.PlaylistCreate, db: Session = Depends(get_db)):
+def add_song_to_playlist(playlist: PlaylistCreate, db: Session = Depends(get_db)):
     if playlist.song in [song.id for song in playlist_repository.get_playlist_songs(db, playlist.session)]:
         raise HTTPException(status_code=422, detail="Song already added to playlist!")
     return to_add_song_to_playlist_response(playlist_repository.add_song_to_playlist(db, playlist))
