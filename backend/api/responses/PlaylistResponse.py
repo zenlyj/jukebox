@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from api.schemas import Playlist as playlist_schemas
+from api.schemas.Playlist import Playlist
 
 class AddSongToPlaylistResponse(BaseModel):
     id: int
@@ -13,7 +13,7 @@ class DeleteSongFromPlaylistResponse(BaseModel):
 class UpdateTokenCodeResponse(BaseModel):
     message: str
 
-def to_add_song_to_playlist_response(playlist_song: playlist_schemas.Playlist) -> AddSongToPlaylistResponse:
+def to_add_song_to_playlist_response(playlist_song: Playlist) -> AddSongToPlaylistResponse:
     return AddSongToPlaylistResponse(id=playlist_song.id, session=playlist_song.session, song=playlist_song.song)
 
 def to_delete_song_from_playlist_response(song_id: int) -> DeleteSongFromPlaylistResponse:

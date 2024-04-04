@@ -1,12 +1,13 @@
 import json
 import jellyfish
+from typing import List
 
 class Parser:
-    def parse(self, subreddit, titles):
+    def parse(self, subreddit, titles) -> List[str]:
         if subreddit == "hiphopheads":
             return self.parseHipHopHeads(titles)
 
-    def parseHipHopHeads(self, titles):
+    def parseHipHopHeads(self, titles) -> List[str]:
         relevantTitles = list(filter(lambda title : "[FRESH]" in title, titles))
         return list(map(lambda title: title.replace("[FRESH] ", ''), relevantTitles))
 
@@ -29,7 +30,7 @@ class Parser:
                 spotify_id = result[i]['id']
         return name, artist_names, uri, album_cover, duration, spotify_id
 
-    def similarity(self, searchResult, query):
+    def similarity(self, searchResult, query) -> float:
         match = ''
         match += searchResult['name']
         for artist in searchResult['artists']:

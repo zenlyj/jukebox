@@ -21,20 +21,18 @@ class PrawBot:
             user_agent = "music_recommendation_bot",
         )
 
-    def update(self):
+    def update(self) -> None:
         sub_name = 'hiphopheads'
         res = self.__pull(sub_name)
-        for song in parser.parse(sub_name, res):
-            self.__push(song)        
+        for song_title in parser.parse(sub_name, res):
+            self.__push(song_title)        
     
-    def __pull(self, subreddit):
-        titles = []
-        for submission in self.reddit.subreddit(subreddit).hot(limit=500):
-            titles.append(submission.title)
-        return titles
+    def __pull(self, subreddit: str):
+        submissions = self.reddit.subreddit(subreddit).hot(limit=500)
+        return [submission.title for submission in submissions]
 
-    def __push(self, song):
-        split = song.split('-')
+    def __push(self, song_title: str) -> None:
+        split = song_title.split('-')
         if len(split) != 2: return
         title = split[1]
         artist = split[0]
@@ -46,7 +44,7 @@ class PrawBot:
         res = requests.post(f"{SERVER_URL}/songs/", data=json.dumps(song))
         print(res.text)
 
-    def __search_song(self, title, artist):
+    def __search_song(self, title: str, artist: str):
         access_token = self.__get_access_token()
         params = {
             'query': self.__sanitize_song_title(title) + ' ' + self.__sanitize_song_artist(artist),
@@ -67,25 +65,25 @@ class PrawBot:
                 self.__search_song(title, artist)
             return None
 
-    def __sanitize_song_title(self, title):
+    def __sanitize_song_title(self, title: str) -> str:
         title = title.lower()
         stop_words = ['official music video', 'official video', '(', ')', '[', ']', 'produced by', 'feat. ', 'ft. ', 'ft ']
         for word in stop_words:
             title = title.replace(word, '')
         return title
 
-    def __sanitize_song_artist(self, artist):
+    def __sanitize_song_artist(self, artist: str) -> str:
         artist = artist.lower()
         stop_words = ['& ', 'feat. ', 'ft. ', 'ft ', 'x ', '(', ')', '[', ']']
         for word in stop_words:
             artist = artist.replace(word, '')
         return artist
 
-    def __get_access_token(self):
+    def __get_access_token(self) -> str:
         f = open('spotify_token.json', 'r')
         return json.load(f)['access_token']
 
-    def __refresh_access_token(self, refresh_token):
+    def __refresh_access_token(self, refresh_token: str) -> None:
         params = {
             'refresh_token': refresh_token
         }

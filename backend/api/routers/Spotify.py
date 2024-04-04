@@ -6,10 +6,12 @@ import base64
 import json
 import os
 
-from ..models.responses.SpotifyResponse import AuthorizeSpotifyResponse
-from ..models.responses.SpotifyResponse import to_authorize_spotify_response
-from ..models.responses.SpotifyResponse import ReauthorizeSpotifyResponse
-from ..models.responses.SpotifyResponse import to_reauthorize_spotify_response
+from ..responses.SpotifyResponse import AuthorizeSpotifyResponse
+from ..responses.SpotifyResponse import to_authorize_spotify_response
+from ..responses.SpotifyResponse import ReauthorizeSpotifyResponse
+from ..responses.SpotifyResponse import to_reauthorize_spotify_response
+from ..responses.SpotifyResponse import SearchSpotifyResponse
+from ..responses.SpotifyResponse import to_search_spotify_response
 
 load_dotenv()
 CLIENT_URL = os.getenv('CLIENT_URL')
@@ -66,7 +68,7 @@ def reauthorize_spotify(refresh_token: str):
     return to_reauthorize_spotify_response(access_token)
 
 
-@router.get("/spotify/search/")
+@router.get("/spotify/search/", response_model=SearchSpotifyResponse)
 def search_spotify(query: str, query_type: str, access_token: str):
     print(query)
     url = 'https://api.spotify.com/v1/search'
@@ -87,11 +89,4 @@ def search_spotify(query: str, query_type: str, access_token: str):
     name, artist_names, uri, album_cover, duration, spotify_id = parser.parseSpotifySearch(result.text, query)
     if uri == None:
         raise HTTPException(status_code=404, detail='Track not found on Spotify')
-    return {
-        'name' : name,
-        'artist_names' : artist_names,
-        'uri' : uri,
-        'album_cover' : album_cover,
-        'duration' : duration,
-        'spotify_id': spotify_id
-    }
+    return to_search_spotify_response(name, artist_names, uri, album_cover, duration, spotify_id)
