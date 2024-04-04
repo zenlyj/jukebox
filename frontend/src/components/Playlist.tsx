@@ -43,9 +43,20 @@ function Playlist() {
   };
 
   return (
-    <Box>
-      <MusicList songs={songs} onClickHandler={removePlaylistSong} />
-      <SpotifyPlayer token={accessToken() ?? ""} uris={uris} />
+    <Box sx={{ height: "100%" }}>
+      <Box sx={{ height: "85%" }}>
+        <MusicList songs={songs} onClickHandler={removePlaylistSong} />
+      </Box>
+      <Box
+        sx={{
+          height: "15%",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+        }}
+      >
+        <SpotifyPlayer token={accessToken() ?? ""} uris={uris} />
+      </Box>
     </Box>
   );
 }

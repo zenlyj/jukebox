@@ -7,6 +7,7 @@ import { Divider } from "@mui/material";
 import { Song } from "./models/Song";
 import Box from "@mui/material/Box";
 import { ListItemAvatar } from "@mui/material";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const formatArtistNames = (artistNames: string[]): string => {
   return artistNames.join(", ");
@@ -30,20 +31,7 @@ function MusicList(props: Props) {
     const songs = props.songs;
     const listItems: React.JSX.Element[] = [];
 
-    if (songs.length === 0) {
-      listItems.push(
-        <ListItem>
-          <ListItemText
-            primary="No Songs Yet..."
-            primaryTypographyProps={{ color: "#a1a1a1ff" }}
-          />
-        </ListItem>
-      );
-      return listItems;
-    }
-
-    for (let i = 0; i < songs.length; i++) {
-      const song = songs[i];
+    songs.forEach((song) => {
       const listItem = (
         <ListItem disablePadding key={song.id}>
           <ListItemButton
@@ -70,7 +58,7 @@ function MusicList(props: Props) {
       );
       listItems.push(listItem);
       listItems.push(<Divider sx={{ bgcolor: "#212224ff" }} />);
-    }
+    });
     return listItems;
   };
 
@@ -89,7 +77,7 @@ function MusicList(props: Props) {
         },
       }}
     >
-      <List> {listItems()} </List>
+      {props.songs ? <List> {listItems()} </List> : <LinearProgress />}
     </Box>
   );
 }
