@@ -23,5 +23,7 @@ frontend/yarn-debug.log*
 frontend/yarn-error.log*
 
 __pycache__/
-sql_app/__pycache__/
-hiphop_jukebox_app.db
+backend/jukebox_app.db
+backend/.env
+frontend/.env
+backend/spotify_token.json
