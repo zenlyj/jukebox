@@ -16,7 +16,7 @@ interface Props {
 
 function AppHeader(props: Props) {
   return (
-    <AppBar position="fixed" sx={{ bgcolor: "#000000" }}>
+    <AppBar position="fixed" sx={{ bgcolor: "#010409" }}>
       <Toolbar>
         <Typography variant="h6" component="span">
           jukebox.

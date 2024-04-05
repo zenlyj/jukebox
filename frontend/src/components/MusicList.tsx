@@ -36,6 +36,11 @@ function MusicList(props: Props) {
         <ListItem disablePadding key={song.id}>
           <ListItemButton
             onClick={() => props.onClickHandler(song.id, song.uri)}
+            sx={{
+              ":hover": {
+                opacity: 0.5,
+              },
+            }}
           >
             <ListItemAvatar sx={{ paddingRight: "1rem" }}>
               <img src={song.albumCover} width={50} height={50}></img>
