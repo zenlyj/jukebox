@@ -16,7 +16,7 @@ class Parser:
         return self.getBestResult(result['tracks']['items'], query)
 
     def getBestResult(self, result, query):
-        name, artist_names, uri, album_cover, duration = None, None, None, None, None
+        name, artist_names, uri, album_cover, duration, spotify_id = None, None, None, None, None, None
         maxSimilarity = float('-inf')
         for i in range(len(result)):
             similarity = self.similarity(result[i], query)
