@@ -1,11 +1,12 @@
 import praw
 import requests
-from parser import Parser
+from api.tools.RedditParser import RedditParser
 import json
 import os
 from dotenv import load_dotenv
+from typing import List
 
-parser = Parser()
+reddit_parser = RedditParser()
 
 load_dotenv()
 CLIENT_URL = os.getenv('CLIENT_URL')
@@ -23,13 +24,11 @@ class PrawBot:
 
     def update(self) -> None:
         sub_name = 'hiphopheads'
-        res = self.__pull(sub_name)
-        for song_title in parser.parse(sub_name, res):
+        for song_title in reddit_parser.parse(sub_name, self.__pull(sub_name)):
             self.__push(song_title)        
     
-    def __pull(self, subreddit: str):
-        submissions = self.reddit.subreddit(subreddit).hot(limit=500)
-        return [submission.title for submission in submissions]
+    def __pull(self, subreddit: str) -> List[object]:
+        return self.reddit.subreddit(subreddit).hot(limit=500)
 
     def __push(self, song_title: str) -> None:
         split = song_title.split('-')
