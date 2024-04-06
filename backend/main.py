@@ -4,10 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import Spotify
 from api.routers import Songs
 from api.routers import Playlist
-from parser import Parser
 
 Base.metadata.create_all(bind=engine)
-parser = Parser()
 
 app = FastAPI()
 

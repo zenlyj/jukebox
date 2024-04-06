@@ -1,6 +1,5 @@
 from fastapi import APIRouter, HTTPException
 from dotenv import load_dotenv
-from parser import Parser
 import requests
 import base64
 import json
@@ -12,13 +11,14 @@ from ..responses.SpotifyResponse import ReauthorizeSpotifyResponse
 from ..responses.SpotifyResponse import to_reauthorize_spotify_response
 from ..responses.SpotifyResponse import SearchSpotifyResponse
 from ..responses.SpotifyResponse import to_search_spotify_response
+from ..tools.SpotifyParser import SpotifyParser
 
 load_dotenv()
 CLIENT_URL = os.getenv('CLIENT_URL')
 SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 
-parser = Parser()
+spotify_parser = SpotifyParser()
 router = APIRouter()
 
 @router.get("/spotify/authorize/", response_model=AuthorizeSpotifyResponse)
@@ -86,7 +86,10 @@ def search_spotify(query: str, query_type: str, access_token: str):
     if result.status_code != 200:
         errorMessage = json.loads(result.text)['error']['message']
         raise HTTPException(status_code=result.status_code, detail=errorMessage)
-    name, artist_names, uri, album_cover, duration, spotify_id = parser.parseSpotifySearch(result.text, query)
-    if uri == None:
+    data = spotify_parser.parse_spotify_search(result.text, query)
+    if not data:
         raise HTTPException(status_code=404, detail='Track not found on Spotify')
+    name, artist_names, uri, album_cover, duration, spotify_id = data
+    if any(not val for val in data):
+        raise HTTPException(status_code=404, detail='Some track data is unavailable')
     return to_search_spotify_response(name, artist_names, uri, album_cover, duration, spotify_id)
