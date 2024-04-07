@@ -8,15 +8,17 @@ import {
 } from "../api/AddSongToPlaylist.tsx";
 import { useOutletContext } from "react-router-dom";
 import { PlaylistSizeContext } from "./models/PlaylistSizeContext.tsx";
+import { Genre } from "./models/Genre.tsx";
 
 function Jukebox() {
+  const [genre, setGenre] = useState<Genre>(Genre.HIPHOP);
   const [songs, setSongs] = useState<Song[]>([]);
   const { playlistSize, setPlaylistSize } =
     useOutletContext<PlaylistSizeContext>();
 
   useEffect(() => {
     if (songs.length === 0) {
-      getSongs().then((response: GetSongsResponse) => {
+      getSongs(genre).then((response: GetSongsResponse) => {
         setSongs(response.songs);
       });
     }

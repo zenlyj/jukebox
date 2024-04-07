@@ -5,6 +5,8 @@ import json
 import os
 from dotenv import load_dotenv
 from typing import List
+from api.tools.DataTypes import Genre
+from api.tools.DataTypes import SubName
 
 reddit_parser = RedditParser()
 
@@ -23,19 +25,21 @@ class PrawBot:
         )
 
     def update(self) -> None:
-        for sub_name in ['hiphopheads', 'electronicmusic']:
+        for genre in [genre for genre in [Genre.HIPHOP, Genre.ELECTRONIC]]:
+            sub_name = SubName[genre]
             for title in reddit_parser.parse(sub_name, self.__pull(sub_name)):
-                self.__push(title)
+                self.__push(title, genre)
     
     def __pull(self, subreddit: str) -> List[object]:
         return self.reddit.subreddit(subreddit).hot(limit=500)
 
-    def __push(self, title: str) -> None:
+    def __push(self, title: str, genre: Genre) -> None:
         print(title)
         song = self.__search_song(title)
-        print(song)
         if (song == None):
             return
+        song['genre_name'] = genre.name
+        print(song)
         res = requests.post(f"{SERVER_URL}/songs/", data=json.dumps(song))
         print(res.text)
 

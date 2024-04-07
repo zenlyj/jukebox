@@ -9,6 +9,7 @@ class GetSongResponse(BaseModel):
     uri: str
     album_cover: str
     duration: int
+    genre_name: str
 
 def to_get_song_response(song: Song) -> GetSongResponse:
-        return GetSongResponse(id=song.id, name=song.name, artist_names=song.artist_names, uri=song.uri, album_cover=song.album_cover, duration=song.duration)
+        return GetSongResponse(id=song.id, name=song.name, artist_names=song.artist_names, uri=song.uri, album_cover=song.album_cover, duration=song.duration, genre_name=song.genre_name)
