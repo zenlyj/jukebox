@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 
 from ..schemas import Song as song_schemas
 from ..schemas import Playlist as playlist_schemas
@@ -9,13 +10,15 @@ from ..models.Playlist import Playlist
 from typing import List
 
 def get_playlist_songs(db: Session, session: str) -> List[song_schemas.Song]:
-    songs = db.query(Song)\
-        .join(Playlist, Song.id == Playlist.song and Playlist.session == session)\
+    songs: List[Song] = db.query(Song)\
+        .join(Playlist, and_(Song.id == Playlist.song, Playlist.session == session))\
+        .all()
+    artists: List[Artist] = db.query(Artist)\
+        .filter(Artist.song_id.in_(set(song.id for song in songs)))\
         .all()
     res = []
     for song in songs:
-        artists = db.query(Artist).filter(Artist.song_id == song.id).all()
-        artist_names = [artist.name for artist in artists]
+        artist_names = [artist.name for artist in artists if artist.song_id == song.id]
         res.append(song_schemas.Song(id=song.id, name=song.name, artist_names=artist_names, uri=song.uri, album_cover=song.album_cover, duration=song.duration, spotify_id=song.spotify_id))
     return res
 
@@ -28,7 +31,7 @@ def add_song_to_playlist(db: Session, playlist: playlist_schemas.PlaylistCreate)
 
 def remove_song_from_playlist(db: Session, session: str, song_id: int) -> int:
     num_deleted = db.query(Playlist)\
-                    .filter(Playlist.song == song_id and Playlist.session == session)\
+                    .filter(Playlist.song == song_id, Playlist.session == session)\
                     .delete()
     db.commit()
     return num_deleted
@@ -39,3 +42,8 @@ def update_access_token_on_refresh(db: Session, old_access_token: str, new_acces
                     .update({Playlist.session: new_access_token})
     db.commit()
     return num_updated
+
+def is_song_exist(db: Session, session: str, song_id: int):
+    return db.query(Playlist)\
+        .filter(Playlist.session == session, Playlist.song == song_id)\
+        .count() > 0

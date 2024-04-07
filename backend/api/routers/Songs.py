@@ -22,6 +22,6 @@ def get_songs(db: Session = Depends(get_db)):
 
 @router.post("/songs/", response_model=GetSongResponse)
 def add_songs(song: SongCreate, db: Session = Depends(get_db)):
-    if song.spotify_id in [song.spotify_id for song in song_repository.get_songs(db)]:
+    if song_repository.is_song_exist(db, song.spotify_id):
         raise HTTPException(status_code=422, detail="Song already created!")
     return to_get_song_response(song_repository.create_song(db, song))

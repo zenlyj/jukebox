@@ -28,7 +28,7 @@ def get_playlist_songs(session: str, db: Session = Depends(get_db)):
 
 @router.post("/playlist/", response_model=AddSongToPlaylistResponse)
 def add_song_to_playlist(playlist: PlaylistCreate, db: Session = Depends(get_db)):
-    if playlist.song in [song.id for song in playlist_repository.get_playlist_songs(db, playlist.session)]:
+    if playlist_repository.is_song_exist(db, playlist.session, playlist.song):
         raise HTTPException(status_code=422, detail="Song already added to playlist!")
     return to_add_song_to_playlist_response(playlist_repository.add_song_to_playlist(db, playlist))
 
