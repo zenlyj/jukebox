@@ -1,3 +1,5 @@
+import { Genre } from "./Genre";
+
 export interface Song {
   id: number;
   name: string;
@@ -5,6 +7,7 @@ export interface Song {
   uri: string;
   albumCover: string;
   duration: number;
+  genreName: Genre;
 }
 
 export interface SongInput {
@@ -14,6 +17,7 @@ export interface SongInput {
   uri: string;
   album_cover: string;
   duration: number;
+  genre_name: Genre;
 }
 
 export function inputToSong(input: SongInput): Song {
@@ -24,5 +28,6 @@ export function inputToSong(input: SongInput): Song {
     uri: input.uri,
     albumCover: input.album_cover,
     duration: input.duration,
+    genreName: input.genre_name,
   };
 }

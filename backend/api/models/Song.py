@@ -10,3 +10,4 @@ class Song(Base):
     album_cover = Column(String)
     duration = Column(Integer)
     spotify_id = Column(String)
+    genre_name = Column(String)
