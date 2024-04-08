@@ -25,7 +25,7 @@ class PrawBot:
         )
 
     def update(self) -> None:
-        for genre in [genre for genre in [Genre.HIPHOP, Genre.ELECTRONIC]]:
+        for genre in [Genre.HIPHOP, Genre.ELECTRONIC]:
             sub_name = SubName[genre]
             for title in reddit_parser.parse(sub_name, self.__pull(sub_name)):
                 self.__push(title, genre)
@@ -43,7 +43,7 @@ class PrawBot:
         res = requests.post(f"{SERVER_URL}/songs/", data=json.dumps(song))
         print(res.text)
 
-    def __search_song(self, query: str):
+    def __search_song(self, query: str) -> dict:
         access_token = self.__get_access_token()
         params = {
             'query': query,
