@@ -10,12 +10,12 @@ import { getPlaylist, GetPlaylistResponse } from "../api/GetPlaylist.tsx";
 import SpotifyPlayer from "react-spotify-web-playback";
 import { accessToken } from "../api/constants.tsx";
 import { useOutletContext } from "react-router-dom";
-import { PlaylistSizeContext } from "./models/PlaylistSizeContext.tsx";
+import { HomeContext } from "./models/HomeContext.tsx";
 
 function Playlist() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [uris, setUris] = useState<string[]>([]);
-  const { setPlaylistSize } = useOutletContext<PlaylistSizeContext>();
+  const { setPlaylistSize } = useOutletContext<HomeContext>();
 
   useEffect(() => {
     getPlaylistSongs();

@@ -4,6 +4,8 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { Badge, Button } from "@mui/material";
 import { Link } from "react-router-dom";
+import { Genre } from "./models/Genre.tsx";
+import { Mode } from "./models/Mode.tsx";
 
 const buttonStyle = {
   textTransform: "none",
@@ -12,6 +14,8 @@ const buttonStyle = {
 
 interface Props {
   playlistSize: number;
+  setGenre: (genre: Genre | null) => void;
+  setMode: (mode: Mode) => void;
 }
 
 function AppHeader(props: Props) {
@@ -25,6 +29,10 @@ function AppHeader(props: Props) {
           size="small"
           component={Link}
           to="/home/discover"
+          onClick={() => {
+            props.setGenre(null);
+            props.setMode(Mode.DISCOVER);
+          }}
           sx={{ marginLeft: "2em", ...buttonStyle }}
         >
           <Typography variant="h6" component="span">
@@ -36,6 +44,10 @@ function AppHeader(props: Props) {
             size="small"
             component={Link}
             to="/home/listen"
+            onClick={() => {
+              props.setGenre(Genre.ELECTRONIC);
+              props.setMode(Mode.LISTEN);
+            }}
             sx={buttonStyle}
           >
             <Typography variant="h6" component="span">

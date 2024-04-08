@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import AppHeader from "./components/AppHeader.tsx";
 import { authorize, AuthorizeResponse } from "./api/Authorize.tsx";
@@ -10,10 +10,15 @@ import {
 } from "./api/RefreshAccessToken.tsx";
 import { Outlet } from "react-router-dom";
 import { GetPlaylistResponse, getPlaylist } from "./api/GetPlaylist.tsx";
+import { GenreSelection } from "./components/GenreSelection.tsx";
+import { Genre } from "./components/models/Genre.tsx";
+import { Mode } from "./components/models/Mode.tsx";
 
 function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
   const [playlistSize, setPlaylistSize] = useState<number>(0);
+  const [genre, setGenre] = useState<Genre | null>(null);
+  const [mode, setMode] = useState<Mode>(Mode.DISCOVER);
 
   useEffect(() => {
     const code = authCode();
@@ -48,6 +53,14 @@ function Home() {
     }
   });
 
+  const isDiscover = (): boolean => {
+    return mode === Mode.DISCOVER;
+  };
+
+  const isListen = (): boolean => {
+    return mode === Mode.LISTEN;
+  };
+
   const containerStyle = (flexDirection: "row" | "column") => ({
     bgcolor: "#141414ff",
     display: "flex",
@@ -58,15 +71,38 @@ function Home() {
   return isLoggedIn ? (
     <Box sx={containerStyle("column")}>
       <Box sx={{ flex: 1 }}>
-        <AppHeader playlistSize={playlistSize} />
-      </Box>
-      <Box sx={{ flex: 9, overflow: "auto" }}>
-        <Outlet
-          context={{
-            playlistSize: playlistSize,
-            setPlaylistSize: setPlaylistSize,
-          }}
+        <AppHeader
+          playlistSize={playlistSize}
+          setGenre={setGenre}
+          setMode={setMode}
         />
+      </Box>
+      <Box
+        sx={{
+          flex: 12,
+          overflow: "auto",
+        }}
+      >
+        {(isDiscover() && genre) || isListen() ? (
+          <Outlet
+            context={{
+              playlistSize: playlistSize,
+              setPlaylistSize: setPlaylistSize,
+              genre: genre,
+            }}
+          />
+        ) : (
+          <Box
+            sx={{
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+            }}
+          >
+            <GenreSelection setGenre={setGenre} />
+          </Box>
+        )}
       </Box>
     </Box>
   ) : (

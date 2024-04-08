@@ -1,14 +1,16 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from ..schemas import Song as song_schemas
 from ..models.Song import Song
 from ..models.Artist import Artist
+from api.tools.DataTypes import Genre
 
 from typing import List
 
 def get_songs(db: Session, genre_name: str, skip: int = 0, limit: int = 100) -> List[song_schemas.Song]:
     songs: List[Song] = db.query(Song)\
-        .filter(Song.genre_name == genre_name)\
+        .filter(or_(genre_name == Genre.GENERAL.name, Song.genre_name == genre_name))\
         .all()
     artists: List[Artist] = db.query(Artist)\
         .filter(Artist.song_id.in_(set(song.id for song in songs)))\
