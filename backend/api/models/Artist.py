@@ -2,6 +2,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String
 
 from ..database import Base
 
+
 class Artist(Base):
     __tablename__ = "artist"
 

@@ -4,9 +4,6 @@ from enum import Enum
 
 SpotifyData = Tuple[str, List[str], str, str, int, str]
 
-Genre = Enum('Genre', ['HIPHOP', 'ELECTRONIC', 'GENERAL'])
+Genre = Enum("Genre", ["HIPHOP", "ELECTRONIC", "GENERAL"])
 
-SubName = {
-    Genre.HIPHOP: 'hiphopheads',
-    Genre.ELECTRONIC: 'electronicmusic'
-}
+SubName = {Genre.HIPHOP: "hiphopheads", Genre.ELECTRONIC: "electronicmusic"}
