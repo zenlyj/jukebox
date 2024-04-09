@@ -9,9 +9,13 @@ from ..responses.SongResponse import to_get_song_response
 
 router = APIRouter()
 
+
 @router.get("/songs/", response_model=List[GetSongResponse])
 def get_songs(genre_name: str, db: Session = Depends(get_db)):
-    return [to_get_song_response(song) for song in song_repository.get_songs(db, genre_name)]
+    return [
+        to_get_song_response(song) for song in song_repository.get_songs(db, genre_name)
+    ]
+
 
 @router.post("/songs/", response_model=GetSongResponse)
 def add_songs(song: SongCreate, db: Session = Depends(get_db)):

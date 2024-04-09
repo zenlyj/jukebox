@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List
 
+
 class SongBase(BaseModel):
     name: str
     artist_names: List[str]
@@ -10,8 +11,10 @@ class SongBase(BaseModel):
     spotify_id: str
     genre_name: str
 
+
 class SongCreate(SongBase):
     pass
+
 
 class Song(SongBase):
     id: int
