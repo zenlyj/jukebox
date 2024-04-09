@@ -9,7 +9,7 @@ class SpotifyParser():
         result: dict = json.loads(result_text)
         tracks_key, items_key = 'tracks', 'items'
         key_not_found = (tracks_key not in result) or (items_key not in result[tracks_key])
-        return self.__get_best_result(result['tracks']['items'], query) if not key_not_found else None
+        return self.__get_best_result(result[tracks_key][items_key], query) if not key_not_found else None
 
     def __get_best_result(self, tracks_data: dict, query: str) -> Union[SpotifyData, None]:
         def to_comparison_text(spotify_data: SpotifyData):

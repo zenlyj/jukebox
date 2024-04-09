@@ -1,6 +1,6 @@
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
-from api.database import SessionLocal
+from api.database import get_db
 from api.schemas.Playlist import PlaylistCreate
 from api.repositories import PlaylistRepository as playlist_repository
 from typing import List
@@ -12,13 +12,6 @@ from ..responses.PlaylistResponse import DeleteSongFromPlaylistResponse
 from ..responses.PlaylistResponse import to_delete_song_from_playlist_response
 from ..responses.PlaylistResponse import UpdateTokenCodeResponse
 from ..responses.PlaylistResponse import to_update_token_code_response
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 router = APIRouter()
 

@@ -1,18 +1,11 @@
 from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
-from api.database import SessionLocal
+from api.database import get_db
 from api.schemas.Song import SongCreate
 from api.repositories import SongRepository as song_repository
 from typing import List
 from ..responses.SongResponse import GetSongResponse
 from ..responses.SongResponse import to_get_song_response
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 router = APIRouter()
 
