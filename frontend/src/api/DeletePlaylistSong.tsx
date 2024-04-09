@@ -7,10 +7,7 @@ export interface DeletePlaylistSongResponse {
 export async function deletePlaylistSong(
   songId: number
 ): Promise<DeletePlaylistSongResponse> {
-  return fetch(
-    `${SERVER_URL}/playlist/?session=${accessToken()}&song_id=${songId}`,
-    {
-      method: "DELETE",
-    }
-  ).then((response: Response) => ({ isDeleted: response.ok }));
+  return fetch(`${SERVER_URL}/playlist/${accessToken()}/${songId}`, {
+    method: "DELETE",
+  }).then((response: Response) => ({ isDeleted: response.ok }));
 }

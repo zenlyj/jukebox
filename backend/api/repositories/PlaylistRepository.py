@@ -10,10 +10,15 @@ from ..models.Playlist import Playlist
 from typing import List
 
 
-def get_playlist_songs(db: Session, session: str) -> List[song_schemas.Song]:
+def get_playlist_songs(
+    db: Session, session: str, page_num: int, page_size: int
+) -> List[song_schemas.Song]:
+    offset, limit = (page_num - 1) * page_size, page_size
     songs: List[Song] = (
         db.query(Song)
         .join(Playlist, and_(Song.id == Playlist.song, Playlist.session == session))
+        .offset(offset)
+        .limit(limit)
         .all()
     )
     artists: List[Artist] = (
@@ -73,10 +78,14 @@ def update_access_token_on_refresh(
     return num_updated
 
 
-def is_song_exist(db: Session, session: str, song_id: int):
+def is_song_exist(db: Session, session: str, song_id: int) -> bool:
     return (
         db.query(Playlist)
         .filter(Playlist.session == session, Playlist.song == song_id)
         .count()
         > 0
     )
+
+
+def get_playlist_size(db: Session, session: str) -> int:
+    return db.query(Playlist).filter(Playlist.session == session).count()

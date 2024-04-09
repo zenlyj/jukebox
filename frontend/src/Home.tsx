@@ -13,6 +13,10 @@ import { GetPlaylistResponse, getPlaylist } from "./api/GetPlaylist.tsx";
 import { GenreSelection } from "./components/GenreSelection.tsx";
 import { Genre } from "./components/models/Genre.tsx";
 import { Mode } from "./components/models/Mode.tsx";
+import {
+  GetPlaylistSizeResponse,
+  getPlaylistSize,
+} from "./api/GetPlaylistSize.tsx";
 
 function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
@@ -45,9 +49,9 @@ function Home() {
       });
     }
     if (isLoggedIn && playlistSize === 0) {
-      getPlaylist().then((response: GetPlaylistResponse) => {
-        if (response.songs.length !== playlistSize) {
-          setPlaylistSize(response.songs.length);
+      getPlaylistSize().then((response: GetPlaylistSizeResponse) => {
+        if (response.size !== playlistSize) {
+          setPlaylistSize(response.size);
         }
       });
     }
