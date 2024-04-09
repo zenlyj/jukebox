@@ -17,6 +17,11 @@ class UpdateTokenCodeResponse(BaseModel):
     message: str
 
 
+class GetPlaylistSizeResponse(BaseModel):
+    size: int
+    message: str
+
+
 def to_add_song_to_playlist_response(
     playlist_song: Playlist,
 ) -> AddSongToPlaylistResponse:
@@ -34,6 +39,11 @@ def to_delete_song_from_playlist_response(
     return DeleteSongFromPlaylistResponse(message=message)
 
 
-def to_update_token_code_response(numUpdated: int) -> UpdateTokenCodeResponse:
-    message = "{numUpdated} songs updated".format(numUpdated=numUpdated)
+def to_update_token_code_response(num_updated: int) -> UpdateTokenCodeResponse:
+    message = "{num_updated} songs updated".format(num_updated=num_updated)
     return UpdateTokenCodeResponse(message=message)
+
+
+def to_get_playlist_size_response(playlist_size: int) -> GetPlaylistSizeResponse:
+    message = "{playlist_size} songs in playlist"
+    return GetPlaylistSizeResponse(size=playlist_size, message=message)

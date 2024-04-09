@@ -10,11 +10,14 @@ from typing import List
 
 
 def get_songs(
-    db: Session, genre_name: str, skip: int = 0, limit: int = 100
+    db: Session, genre_name: str, page_num: int, page_size: int
 ) -> List[song_schemas.Song]:
+    offset, limit = (page_num - 1) * page_size, page_size
     songs: List[Song] = (
         db.query(Song)
         .filter(or_(genre_name == Genre.GENERAL.name, Song.genre_name == genre_name))
+        .offset(offset)
+        .limit(limit)
         .all()
     )
     artists: List[Artist] = (
@@ -74,5 +77,9 @@ def create_song(db: Session, song: song_schemas.SongCreate) -> song_schemas.Song
     )
 
 
-def is_song_exist(db: Session, spotify_id: str):
+def is_song_exist(db: Session, spotify_id: str) -> bool:
     return db.query(Song).filter(Song.spotify_id == spotify_id).count() > 0
+
+
+def get_song_count(db: Session, genre_name: str) -> int:
+    return db.query(Song).filter(Song.genre_name == genre_name).count()

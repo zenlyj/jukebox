@@ -1,4 +1,4 @@
-import { SERVER_URL, accessToken, refreshToken } from "./constants.tsx";
+import { SERVER_URL, refreshToken } from "./constants.tsx";
 
 const isAccessTokenExpired = async (accessToken: string): Promise<boolean> => {
   return fetch(
