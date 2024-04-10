@@ -1,5 +1,8 @@
 from typing import List
 from typing import Union
+from datetime import datetime
+from api.tools.DataTypes import SubName
+from api.tools.DataTypes import Genre
 import re
 
 
@@ -19,20 +22,25 @@ class RedditParser:
     tag, tag_regex = "[fresh]", "\[fresh\]"
 
     def parse(self, subreddit: str, submissions: List[object]) -> List[str]:
-        titles: List[str] = [submission.title for submission in submissions]
-        if subreddit == "hiphopheads":
-            return [title for title in self.__parse_hiphopheads(titles) if title]
-        if subreddit == "electronicmusic":
-            return [title for title in self.__parse_electronicmusic(titles) if title]
-        return []
+        relevant_submissions = [submission for submission in submissions if self.tag in submission.title.lower()]
+        titles: List[str] = [submission.title for submission in relevant_submissions]
+        normalized_titles = []
+        if subreddit == SubName[Genre.HIPHOP]:
+            normalized_titles = [title for title in self.__parse_hiphopheads_titles(titles) if title]
+        if subreddit == SubName[Genre.ELECTRONIC]:
+            normalized_titles = [title for title in self.__parse_electronicmusic_titles(titles) if title]
+        created_timestamps = [float(submission.created_utc) for submission in relevant_submissions]
+        print(created_timestamps)
+        created_dates = [datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M') for timestamp in created_timestamps]
+        print(created_dates)
+        return normalized_titles
+        
 
-    def __parse_hiphopheads(self, titles: List[str]) -> List[str]:
-        relevant_titles = [title for title in titles if self.tag in title.lower()]
-        return [self.__normalize(title) for title in relevant_titles]
+    def __parse_hiphopheads_titles(self, titles: List[str]) -> List[str]:
+        return [self.__normalize(title) for title in titles]
 
-    def __parse_electronicmusic(self, titles: List[str]) -> List[str]:
-        relevant_titles = [title for title in titles if self.tag in title.lower()]
-        return [self.__normalize(title) for title in relevant_titles]
+    def __parse_electronicmusic_titles(self, titles: List[str]) -> List[str]:
+        return [self.__normalize(title) for title in titles]
 
     def __normalize(self, title: str) -> Union[str, None]:
         split = self.__remove_tag(title).split("-")
