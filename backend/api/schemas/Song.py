@@ -16,6 +16,16 @@ class SongCreate(SongBase):
     pass
 
 
+class SongOut(BaseModel):
+    id: int
+    name: str
+    artist_names: List[str]
+    uri: str
+    album_cover: str
+    duration: int
+    genre_name: str
+
+
 class Song(SongBase):
     id: int
 
