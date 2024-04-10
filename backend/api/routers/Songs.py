@@ -1,13 +1,11 @@
-from fastapi import Depends, APIRouter, HTTPException
+from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from api.database import get_db
 from api.schemas.Song import SongCreate
-from api.repositories import SongRepository as song_repository
-from typing import List
-from ..responses.SongResponse import GetSongResponse
-from ..responses.SongResponse import to_get_song_response
-from ..responses.SongResponse import CreateSongResponse
-from ..responses.SongResponse import to_create_song_response
+from api.repositories.SongRepository import SongRepository
+from api.services.SongService import SongService
+from api.responses.SongResponse import GetSongResponse
+from api.responses.SongResponse import CreateSongResponse
 
 
 router = APIRouter()
@@ -19,14 +17,17 @@ def get_songs(
     page_num: int = 1,
     page_size: int = 20,
     db: Session = Depends(get_db),
+    song_repo: SongRepository = Depends(SongRepository),
+    song_service: SongService = Depends(SongService),
 ):
-    songs = song_repository.get_songs(db, genre_name, page_num, page_size)
-    song_count = song_repository.get_song_count(db, genre_name)
-    return to_get_song_response(songs, song_count)
+    return song_service.get_songs(db, song_repo, genre_name, page_num, page_size)
 
 
 @router.post("/songs/", response_model=CreateSongResponse)
-def add_songs(song: SongCreate, db: Session = Depends(get_db)):
-    if song_repository.is_song_exist(db, song.spotify_id):
-        raise HTTPException(status_code=422, detail="Song already created!")
-    return to_create_song_response(song_repository.create_song(db, song))
+def add_songs(
+    song: SongCreate,
+    db: Session = Depends(get_db),
+    song_repo: SongRepository = Depends(SongRepository),
+    song_service: SongService = Depends(SongService),
+):
+    return song_service.add_song(db, song_repo, song)

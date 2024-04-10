@@ -1,64 +1,77 @@
-from fastapi import Depends, APIRouter, HTTPException
+from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from api.database import get_db
 from api.schemas.Playlist import PlaylistCreate
-from api.repositories import PlaylistRepository as playlist_repository
-from typing import List
-from ..responses.SongResponse import GetSongResponse
-from ..responses.SongResponse import to_get_song_response
-from ..responses.PlaylistResponse import AddSongToPlaylistResponse
-from ..responses.PlaylistResponse import to_add_song_to_playlist_response
-from ..responses.PlaylistResponse import DeleteSongFromPlaylistResponse
-from ..responses.PlaylistResponse import to_delete_song_from_playlist_response
-from ..responses.PlaylistResponse import UpdateTokenCodeResponse
-from ..responses.PlaylistResponse import to_update_token_code_response
-from ..responses.PlaylistResponse import GetPlaylistSizeResponse
-from ..responses.PlaylistResponse import to_get_playlist_size_response
+from api.repositories.PlaylistRepository import PlaylistRepository
+from api.services.PlaylistService import PlaylistService
+from api.services.SongService import SongService
+from api.responses.SongResponse import GetSongResponse
+from api.responses.PlaylistResponse import AddSongToPlaylistResponse
+from api.responses.PlaylistResponse import DeleteSongFromPlaylistResponse
+from api.responses.PlaylistResponse import UpdateTokenCodeResponse
+from api.responses.PlaylistResponse import GetPlaylistSizeResponse
 
 router = APIRouter()
 
 
 @router.get("/playlist/{session}", response_model=GetSongResponse)
 def get_playlist_songs(
-    session: str, page_num: int = 1, page_size: int = 20, db: Session = Depends(get_db)
+    session: str,
+    page_num: int = 1,
+    page_size: int = 20,
+    db: Session = Depends(get_db),
+    playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
+    playlist_service: PlaylistService = Depends(PlaylistService),
+    song_service: SongService = Depends(SongService),
 ):
-    songs = playlist_repository.get_playlist_songs(db, session, page_num, page_size)
-    playlist_size = playlist_repository.get_playlist_size(db, session)
-    return to_get_song_response(songs, playlist_size)
+    return playlist_service.get_playlist_songs(
+        db, playlist_repo, song_service, session, page_num, page_size
+    )
 
 
 @router.get("/playlist/{session}/size", response_model=GetPlaylistSizeResponse)
-def get_playlist_size(session: str, db: Session = Depends(get_db)):
-    size = playlist_repository.get_playlist_size(db, session)
-    return to_get_playlist_size_response(size)
+def get_playlist_size(
+    session: str,
+    db: Session = Depends(get_db),
+    playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
+    playlist_service: PlaylistService = Depends(PlaylistService),
+):
+    return playlist_service.get_playlist_size(db, playlist_repo, session)
 
 
 @router.post("/playlist/", response_model=AddSongToPlaylistResponse)
-def add_song_to_playlist(playlist: PlaylistCreate, db: Session = Depends(get_db)):
-    if playlist_repository.is_song_exist(db, playlist.session, playlist.song):
-        raise HTTPException(status_code=422, detail="Song already added to playlist!")
-    return to_add_song_to_playlist_response(
-        playlist_repository.add_song_to_playlist(db, playlist)
-    )
+def add_song_to_playlist(
+    playlist: PlaylistCreate,
+    db: Session = Depends(get_db),
+    playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
+    playlist_service: PlaylistService = Depends(PlaylistService),
+):
+    return playlist_service.add_song_to_playlist(db, playlist_repo, playlist)
 
 
 @router.delete(
     "/playlist/{session}/{song_id}", response_model=DeleteSongFromPlaylistResponse
 )
 def remove_song_from_playlist(
-    session: str, song_id: int, db: Session = Depends(get_db)
+    session: str,
+    song_id: int,
+    db: Session = Depends(get_db),
+    playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
+    playlist_service: PlaylistService = Depends(PlaylistService),
 ):
-    numDeleted = playlist_repository.remove_song_from_playlist(db, session, song_id)
-    if numDeleted == 0:
-        raise HTTPException(status_code=422, detail="Failed to delete song")
-    return to_delete_song_from_playlist_response(song_id)
+    return playlist_service.remove_song_from_playlist(
+        db, playlist_repo, session, song_id
+    )
 
 
 @router.put("/playlist/", response_model=UpdateTokenCodeResponse)
 def update_token_code(
-    old_access_token: str, new_access_token: str, db: Session = Depends(get_db)
+    old_access_token: str,
+    new_access_token: str,
+    db: Session = Depends(get_db),
+    playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
+    playlist_service: PlaylistService = Depends(PlaylistService),
 ):
-    num_updated = playlist_repository.update_access_token_on_refresh(
-        db, old_access_token, new_access_token
+    return playlist_service.update_token_code(
+        db, playlist_repo, old_access_token, new_access_token
     )
-    return to_update_token_code_response(num_updated)

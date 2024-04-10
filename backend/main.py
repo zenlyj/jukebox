@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from api.database import SessionLocal, engine, Base
+from api.database import engine, Base
 from fastapi.middleware.cors import CORSMiddleware
 from api.routers import Spotify
 from api.routers import Songs
