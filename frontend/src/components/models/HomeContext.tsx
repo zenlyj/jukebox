@@ -1,3 +1,4 @@
+import React from "react";
 import { Genre } from "./Genre";
 
 export interface HomeContext {

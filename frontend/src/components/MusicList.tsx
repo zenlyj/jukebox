@@ -37,7 +37,7 @@ function MusicList(props: Props) {
           <ListItemButton
             onClick={() => props.onClickHandler(song.id, song.uri)}
             sx={{
-              ":hover": {
+              "&:hover": {
                 opacity: 0.5,
               },
             }}

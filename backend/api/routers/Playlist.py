@@ -17,8 +17,8 @@ router = APIRouter()
 @router.get("/playlist/{session}", response_model=GetSongResponse)
 def get_playlist_songs(
     session: str,
-    page_num: int = 1,
-    page_size: int = 20,
+    page_num: int,
+    page_size: int,
     db: Session = Depends(get_db),
     playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
     playlist_service: PlaylistService = Depends(PlaylistService),
