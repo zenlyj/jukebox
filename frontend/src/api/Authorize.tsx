@@ -5,10 +5,16 @@ interface ServerResponse {
   refresh_token: string | null;
 }
 
-const mapResponse = (response: ServerResponse) => ({
-  accessToken: response.access_token,
-  refreshToken: response.refresh_token,
-});
+const mapServerResponse = (
+  response: ServerResponse | null
+): AuthorizeResponse => {
+  return response
+    ? {
+        accessToken: response.access_token,
+        refreshToken: response.refresh_token,
+      }
+    : { accessToken: null, refreshToken: null };
+};
 
 export interface AuthorizeResponse {
   accessToken: string | null;
@@ -17,10 +23,6 @@ export interface AuthorizeResponse {
 
 export function authorize(authCode: string): Promise<AuthorizeResponse> {
   return fetch(`${SERVER_URL}/spotify/authorize?authorization_code=${authCode}`)
-    .then((response: Response) =>
-      response.ok
-        ? response.json()
-        : { access_token: null, refresh_token: null }
-    )
-    .then((response: ServerResponse) => mapResponse(response));
+    .then((response: Response) => (response.ok ? response.json() : null))
+    .then((response: ServerResponse | null) => mapServerResponse(response));
 }

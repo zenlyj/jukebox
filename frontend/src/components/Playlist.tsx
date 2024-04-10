@@ -11,22 +11,28 @@ import SpotifyPlayer from "react-spotify-web-playback";
 import { accessToken } from "../api/constants.tsx";
 import { useOutletContext } from "react-router-dom";
 import { HomeContext } from "./models/HomeContext.tsx";
+import { MusicListPagination } from "./MusicListPagination.tsx";
 
 function Playlist() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [uris, setUris] = useState<string[]>([]);
+  const [songCount, setSongCount] = useState<number>(0);
   const { setPlaylistSize } = useOutletContext<HomeContext>();
+  const pageSize = 10;
 
   useEffect(() => {
-    getPlaylistSongs();
+    if (songs.length === 0) {
+      getPlaylistSongs();
+    }
   });
 
   const getPlaylistSongs = (): void => {
-    getPlaylist().then((response: GetPlaylistResponse) => {
+    getPlaylist(1, pageSize).then((response: GetPlaylistResponse) => {
       if (response.songs.length !== songs.length) {
         setSongs(response.songs);
         setUris(response.songs.map((song) => song.uri));
-        setPlaylistSize(response.songs.length);
+        setSongCount(response.playlistSize);
+        setPlaylistSize(response.playlistSize);
       }
     });
   };
@@ -42,10 +48,29 @@ function Playlist() {
     });
   };
 
+  const handlePageChange = (event, pageNumber: number): void => {
+    getPlaylist(pageNumber, pageSize).then((response: GetPlaylistResponse) => {
+      if (response.songs.length !== 0) {
+        setSongs(response.songs);
+        setUris(response.songs.map((song) => song.uri));
+        setSongCount(response.playlistSize);
+        setPlaylistSize(response.playlistSize);
+      }
+    });
+  };
+
+  const getPageCount = () => {
+    return Math.ceil(songCount / pageSize);
+  };
+
   return (
     <Box sx={{ height: "100%" }}>
       <Box sx={{ height: "85%" }}>
         <MusicList songs={songs} onClickHandler={removePlaylistSong} />
+        <MusicListPagination
+          pageCount={getPageCount()}
+          handlePageChange={handlePageChange}
+        />
       </Box>
       <Box
         sx={{

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import AppHeader from "./components/AppHeader.tsx";
 import { authorize, AuthorizeResponse } from "./api/Authorize.tsx";
@@ -9,7 +9,6 @@ import {
   RefreshAccessTokenResponse,
 } from "./api/RefreshAccessToken.tsx";
 import { Outlet } from "react-router-dom";
-import { GetPlaylistResponse, getPlaylist } from "./api/GetPlaylist.tsx";
 import { GenreSelection } from "./components/GenreSelection.tsx";
 import { Genre } from "./components/models/Genre.tsx";
 import { Mode } from "./components/models/Mode.tsx";

@@ -1,14 +1,60 @@
-import { Song, SongInput, inputToSong } from "../components/models/Song.tsx";
+import { Genre } from "../components/models/Genre.tsx";
+import { Song } from "../components/models/Song.tsx";
 import { SERVER_URL, accessToken } from "./constants.tsx";
 
 export interface GetPlaylistResponse {
   songs: Song[];
+  playlistSize: number;
 }
 
-export async function getPlaylist(): Promise<GetPlaylistResponse> {
-  return fetch(`${SERVER_URL}/playlist/${accessToken()}`)
-    .then((response: Response) => (response.ok ? response.json() : []))
-    .then((inputs: SongInput[]) => ({
-      songs: inputs.map((input) => inputToSong(input)),
-    }));
+export interface ServerResponse {
+  songs: {
+    id: number;
+    name: string;
+    artist_names: string[];
+    uri: string;
+    album_cover: string;
+    duration: number;
+    genre_name: Genre;
+  }[];
+  song_count: number;
+}
+
+const mapServerResponse = (
+  response: ServerResponse | null
+): GetPlaylistResponse => {
+  if (!response) {
+    return {
+      songs: [],
+      playlistSize: 0,
+    };
+  }
+  const songs = response.songs.map((song) => ({
+    id: song.id,
+    name: song.name,
+    artistNames: song.artist_names,
+    uri: song.uri,
+    albumCover: song.album_cover,
+    duration: song.duration,
+    genreName: song.genre_name,
+  }));
+  return {
+    songs: songs,
+    playlistSize: response.song_count,
+  };
+};
+
+export async function getPlaylist(
+  pageNumber: number,
+  pageSize: number
+): Promise<GetPlaylistResponse> {
+  const url =
+    `${SERVER_URL}/playlist/${accessToken()}/?` +
+    new URLSearchParams({
+      page_num: `${pageNumber}`,
+      page_size: `${pageSize}`,
+    });
+  return fetch(url)
+    .then((response: Response) => (response.ok ? response.json() : null))
+    .then((response: ServerResponse | null) => mapServerResponse(response));
 }
