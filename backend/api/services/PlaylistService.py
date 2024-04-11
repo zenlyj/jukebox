@@ -45,6 +45,7 @@ class PlaylistService:
                     album_cover=song.album_cover,
                     duration=song.duration,
                     genre_name=song.genre_name,
+                    timestamp=song.timestamp
                 )
             )
         playlist_size = playlist_repo.get_playlist_size(db, session)

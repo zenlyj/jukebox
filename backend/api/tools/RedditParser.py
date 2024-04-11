@@ -1,8 +1,8 @@
 from typing import List
 from typing import Union
-from datetime import datetime
 from api.tools.DataTypes import SubName
 from api.tools.DataTypes import Genre
+from api.tools.DataTypes import RedditData
 import re
 
 
@@ -21,7 +21,7 @@ class RedditParser:
     ]
     tag, tag_regex = "[fresh]", "\[fresh\]"
 
-    def parse(self, subreddit: str, submissions: List[object]) -> List[str]:
+    def parse(self, subreddit: str, submissions: List[object]) -> List[RedditData]:
         relevant_submissions = [submission for submission in submissions if self.tag in submission.title.lower()]
         titles: List[str] = [submission.title for submission in relevant_submissions]
         normalized_titles = []
@@ -29,11 +29,8 @@ class RedditParser:
             normalized_titles = [title for title in self.__parse_hiphopheads_titles(titles) if title]
         if subreddit == SubName[Genre.ELECTRONIC]:
             normalized_titles = [title for title in self.__parse_electronicmusic_titles(titles) if title]
-        created_timestamps = [float(submission.created_utc) for submission in relevant_submissions]
-        print(created_timestamps)
-        created_dates = [datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M') for timestamp in created_timestamps]
-        print(created_dates)
-        return normalized_titles
+        created_timestamps = [str(int(submission.created_utc)) for submission in relevant_submissions]
+        return [(data[0], data[1]) for data in zip(normalized_titles, created_timestamps)]
         
 
     def __parse_hiphopheads_titles(self, titles: List[str]) -> List[str]:

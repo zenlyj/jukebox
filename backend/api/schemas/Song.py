@@ -10,6 +10,7 @@ class SongBase(BaseModel):
     duration: int
     spotify_id: str
     genre_name: str
+    timestamp: str
 
 
 class SongCreate(SongBase):
@@ -24,6 +25,7 @@ class SongOut(BaseModel):
     album_cover: str
     duration: int
     genre_name: str
+    timestamp: str
 
 
 class Song(SongBase):
