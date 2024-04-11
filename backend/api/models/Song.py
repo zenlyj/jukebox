@@ -12,3 +12,4 @@ class Song(Base):
     duration = Column(Integer)
     spotify_id = Column(String)
     genre_name = Column(String)
+    timestamp = Column(String)

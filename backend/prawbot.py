@@ -28,18 +28,19 @@ class PrawBot:
     def update(self) -> None:
         for genre in [Genre.HIPHOP, Genre.ELECTRONIC]:
             sub_name = SubName[genre]
-            for title in reddit_parser.parse(sub_name, self.__pull(sub_name)):
-                self.__push(title, genre)
+            for title, timestamp in reddit_parser.parse(sub_name, self.__pull(sub_name)):
+                self.__push(title, genre, timestamp)
 
     def __pull(self, subreddit: str) -> List[object]:
         return self.reddit.subreddit(subreddit).hot(limit=500)
 
-    def __push(self, title: str, genre: Genre) -> None:
+    def __push(self, title: str, genre: Genre, timestamp) -> None:
         print(title)
         song = self.__search_song(title)
-        if song == None:
+        if not song:
             return
         song["genre_name"] = genre.name
+        song["timestamp"] = timestamp
         print(song)
         res = requests.post(f"{SERVER_URL}/songs/", data=json.dumps(song))
         print(res.text)
