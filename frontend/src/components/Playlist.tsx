@@ -26,9 +26,16 @@ function Playlist() {
     }
   });
 
+  const isSongChanged = (newSongs: Song[]): boolean => {
+    const currIds = new Set(songs.map((song) => song.id));
+    return songCount > pageSize
+      ? newSongs.some((song) => !currIds.has(song.id))
+      : newSongs.length !== songs.length;
+  };
+
   const getPlaylistSongs = (): void => {
     getPlaylist(1, pageSize).then((response: GetPlaylistResponse) => {
-      if (response.songs.length !== songs.length) {
+      if (isSongChanged(response.songs)) {
         setSongs(response.songs);
         setUris(response.songs.map((song) => song.uri));
         setSongCount(response.playlistSize);
