@@ -16,6 +16,7 @@ export interface ServerResponse {
     album_cover: string;
     duration: number;
     genre_name: Genre;
+    timestamp: string;
   }[];
   song_count: number;
 }
@@ -37,6 +38,7 @@ const mapServerResponse = (
     albumCover: song.album_cover,
     duration: song.duration,
     genreName: song.genre_name,
+    timestamp: song.timestamp,
   }));
   return {
     songs: songs,

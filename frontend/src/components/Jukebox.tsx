@@ -55,7 +55,11 @@ function Jukebox() {
 
   return (
     <Box sx={{ padding: "1rem" }}>
-      <MusicList songs={songs} onClickHandler={addToPlaylist} />
+      <MusicList
+        songs={songs}
+        displayDate={true}
+        onClickHandler={addToPlaylist}
+      />
       <Box sx={{ marginTop: "1rem" }}>
         <MusicListPagination
           pageCount={getPageCount()}

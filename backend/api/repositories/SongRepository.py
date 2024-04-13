@@ -17,6 +17,7 @@ class SongRepository:
             .filter(
                 or_(genre_name == Genre.GENERAL.name, Song.genre_name == genre_name)
             )
+            .order_by(Song.timestamp.desc())
             .offset(offset)
             .limit(limit)
             .all()

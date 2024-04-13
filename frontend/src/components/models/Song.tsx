@@ -8,4 +8,5 @@ export interface Song {
   albumCover: string;
   duration: number;
   genreName: Genre;
+  timestamp: string;
 }
