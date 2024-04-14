@@ -66,22 +66,32 @@ function Playlist() {
     });
   };
 
-  const getPageCount = () => {
+  const getPageCount = (): number => {
     return Math.ceil(songCount / pageSize);
   };
 
   return (
     <Box sx={{ height: "100%" }}>
-      <Box sx={{ height: "85%" }}>
-        <MusicList songs={songs} onClickHandler={removePlaylistSong} />
-        <MusicListPagination
-          pageCount={getPageCount()}
-          handlePageChange={handlePageChange}
-        />
+      <Box sx={{ height: "90%", overflow: "auto" }}>
+        <Box
+          sx={{
+            padding: "1rem",
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            justifyContent: "space-between",
+          }}
+        >
+          <MusicList songs={songs} onClickHandler={removePlaylistSong} />
+          <MusicListPagination
+            pageCount={getPageCount()}
+            handlePageChange={handlePageChange}
+          />
+        </Box>
       </Box>
       <Box
         sx={{
-          height: "15%",
+          height: "10%",
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-end",

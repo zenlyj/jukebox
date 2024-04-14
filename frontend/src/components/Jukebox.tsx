@@ -49,23 +49,29 @@ function Jukebox() {
     });
   };
 
-  const getPageCount = () => {
+  const getPageCount = (): number => {
     return Math.ceil(songCount / pageSize);
   };
 
   return (
-    <Box sx={{ padding: "1rem" }}>
+    <Box
+      sx={{
+        padding: "1rem",
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        justifyContent: "space-between",
+      }}
+    >
       <MusicList
         songs={songs}
         displayDate={true}
         onClickHandler={addToPlaylist}
       />
-      <Box sx={{ marginTop: "1rem" }}>
-        <MusicListPagination
-          pageCount={getPageCount()}
-          handlePageChange={handlePageChange}
-        />
-      </Box>
+      <MusicListPagination
+        pageCount={getPageCount()}
+        handlePageChange={handlePageChange}
+      />
     </Box>
   );
 }

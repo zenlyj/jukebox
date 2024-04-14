@@ -65,7 +65,6 @@ function Home() {
   };
 
   const containerStyle = (flexDirection: "row" | "column") => ({
-    bgcolor: "#141414ff",
     display: "flex",
     flexDirection: flexDirection,
     height: "100vh",
@@ -73,7 +72,7 @@ function Home() {
 
   return isLoggedIn ? (
     <Box sx={containerStyle("column")}>
-      <Box sx={{ flex: 1 }}>
+      <Box sx={{ height: "7%" }}>
         <AppHeader
           playlistSize={playlistSize}
           setGenre={setGenre}
@@ -82,7 +81,7 @@ function Home() {
       </Box>
       <Box
         sx={{
-          flex: 12,
+          flex: 1,
           overflow: "auto",
         }}
       >

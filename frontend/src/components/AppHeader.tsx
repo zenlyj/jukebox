@@ -6,11 +6,7 @@ import { Badge, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Genre } from "./models/Genre.tsx";
 import { Mode } from "./models/Mode.tsx";
-
-const buttonStyle = {
-  textTransform: "none",
-  color: "#ffffff",
-};
+import { jbblack, jbwhite } from "../utils/colors.tsx";
 
 interface Props {
   playlistSize: number;
@@ -19,8 +15,13 @@ interface Props {
 }
 
 function AppHeader(props: Props) {
+  const buttonStyle = {
+    textTransform: "none",
+    color: jbwhite,
+  };
+
   return (
-    <AppBar position="fixed" sx={{ bgcolor: "#010409" }}>
+    <AppBar position="fixed" sx={{ bgcolor: jbblack }}>
       <Toolbar>
         <Typography variant="h6" component="span">
           jukebox.
