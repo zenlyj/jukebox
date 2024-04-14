@@ -76,7 +76,7 @@ function AppHeader(props: Props) {
           sx={{ flexGrow: 1 }}
           align="right"
         >
-          v0.1.0
+          v0.2.0
         </Typography>
       </Toolbar>
     </AppBar>
