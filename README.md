@@ -1,35 +1,49 @@
-# Motivation
+# About
 
-As an avid fan of hip-hop music, I find myself browsing [r/hiphopheads](https://www.reddit.com/r/hiphopheads/) frequently to discover newly released tracks and albums to listen to. However, the process of sifting through a sea of posts to find related content can be tiresome, not to mention the added step of searching up tracks on Spotify to play them. Hence, jukebox was developed to automate this mundane process, allowing us to save time and streamline our music discovery-listening.
+On popular social news aggregation platform [Reddit](https://www.reddit.com/), there are communities/subreddits dedicated to music discussion, such as [r/hiphopheads](https://www.reddit.com/r/hiphopheads/), [r/electronicmusic](https://www.reddit.com/r/electronicmusic/), [r/indieheads](https://www.reddit.com/r/indieheads/). In these communities, users post about the latest music, videos and news relating to their favorite artists.
+
+jukebox is a web application that extracts user-submitted song recommendations from the abundance of information that is available in these music communities. It supports music playback with Spotify, allowing users to listen to the recommended songs on jukebox, streamlining their music discovery and listening experience.
 
 # Tools and Technologies
 
 1. FastAPI
-2. ReactJS
+2. React
 3. SQLite
 4. [PRAW](https://praw.readthedocs.io/en/stable/)
 5. [Spotify-API](https://developer.spotify.com/documentation/web-api/)
-
 
 # Features
 
 ## Spotify Integration
 
-![spotify_login](https://raw.githubusercontent.com/zenlyj/hip-hop-jukebox/main/README_images/spotify_login.PNG)
+![spotify_login](https://raw.githubusercontent.com/zenlyj/jukebox/main/docs/spotify_login.PNG)
 
-The application integrates with Spotify, allowing users to play recommended tracks through the browser. Upon application launch, users will be greeted with a Spotify login page, prompting for user authentication. A premium Spotify account will be required in order to use Spotify API. The application handles refresh of API access tokens, therefore, users do not need to authenticate themselves frequently.
+The application integrates with Spotify, allowing users to play recommended tracks through the browser. On application launch, users will be greeted with the Spotify login page, prompting for user authentication.
 
-## Music Recommendation
+A premium Spotify account is required in order to use the Spotify API for music playback. The application automatically refreshes access tokens to ensure that users remain authenticated with Spotify over prolonged application usage.
 
-![song_recommendation](https://raw.githubusercontent.com/zenlyj/hip-hop-jukebox/main/README_images/song_recommendation.PNG)
+## Discover Mode
 
-Upon authentication with Spotify, the user will be redirected to the home page of Hip Hop Jukebox. On the left of the page is a list of music tracks pulled from r/hiphopheads.
+![discover_selection](https://raw.githubusercontent.com/zenlyj/jukebox/main/docs/discover_selection.PNG)
 
-## Music Playback
+Once authenticated, users will be brought to the Discover page, where they have the following music genre options to choose from:
 
-![song_playlist](https://raw.githubusercontent.com/zenlyj/hip-hop-jukebox/main/README_images/song_playlist.PNG)
+- Hip-Hop, from [r/hiphopheads](https://www.reddit.com/r/hiphopheads/)
+- Electronic, from [r/electronicmusic](https://www.reddit.com/r/electronicmusic/)
+- Indie, from [r/indieheads](https://www.reddit.com/r/indieheads/)
+- General, from every genre listed above
 
-After identifying music tracks of interest, users can place them in a playlist by clicking on the items on the recommendation list. After which, users are able to play songs in the playlist by clicking on the header of the playlist.
+![discover_browse](https://raw.githubusercontent.com/zenlyj/jukebox/main/docs/discover_browse.PNG)
 
-![song_player](https://raw.githubusercontent.com/zenlyj/hip-hop-jukebox/main/README_images/song_player.PNG)
-A player component will be shown, allowing users to control the music playback.
+Upon selecting a genre, a list of recommended tracks will be displayed along with the following information:
+
+- Song title
+- Song artist(s)
+- Timestamp of associated Reddit post
+- Song duration
+
+## Listen Mode
+
+![listen](https://raw.githubusercontent.com/zenlyj/jukebox/main/docs/listen.PNG)
+
+In the Listen page, a playlist is shown, consisting of tracks added from the Discover page. At the bottom of the page, the music player is used to control music playback.
