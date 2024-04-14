@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import { ListItemAvatar } from "@mui/material";
 import LinearProgress from "@mui/material/LinearProgress";
 import { getMonthName, padNum } from "../utils/datetime.tsx";
+import { jbdarkgrey, jbgrey, jblightgrey } from "../utils/colors.tsx";
 
 interface Props {
   songs: Song[];
@@ -35,9 +36,13 @@ function MusicList(props: Props) {
     const day = date.getDate();
     const hour = date.getHours();
     const min = date.getMinutes();
-    return `${padNum(day)}-${getMonthName(month)}-${year} - ${padNum(
+    return `${padNum(day)}-${getMonthName(month)}-${year} ~ ${padNum(
       hour
     )}:${padNum(min)}`;
+  };
+
+  const secondaryTypographyProps = {
+    color: jblightgrey,
   };
 
   const listItem = (song: Song): React.JSX.Element => (
@@ -56,23 +61,18 @@ function MusicList(props: Props) {
         <ListItemText
           primary={song.name}
           secondary={formatArtistNames(song.artistNames)}
-          primaryTypographyProps={{ color: "#ffffff" }}
-          secondaryTypographyProps={{ color: "#a1a1a1ff" }}
+          secondaryTypographyProps={secondaryTypographyProps}
         />
         <Box sx={{ display: "flex", columnGap: "2rem" }}>
           {props.displayDate ? (
             <ListItemText
               secondary={formatTimestamp(song.timestamp)}
-              secondaryTypographyProps={{
-                color: "#a1a1a1ff",
-              }}
+              secondaryTypographyProps={secondaryTypographyProps}
             />
           ) : null}
           <ListItemText
             secondary={formatDuration(song.duration)}
-            secondaryTypographyProps={{
-              color: "#a1a1a1ff",
-            }}
+            secondaryTypographyProps={secondaryTypographyProps}
           />
         </Box>
       </ListItemButton>
@@ -82,15 +82,13 @@ function MusicList(props: Props) {
   return (
     <Box
       sx={{
-        width: "100%",
-        height: "100%",
-        bgcolor: "#141414ff",
+        flex: 1,
         overflow: "auto",
         "&::-webkit-scrollbar": {
-          backgroundColor: "#141414ff",
+          backgroundColor: jbdarkgrey,
         },
         "&::-webkit-scrollbar-thumb": {
-          backgroundColor: "#212224ff",
+          backgroundColor: jbgrey,
         },
       }}
     >
@@ -101,7 +99,7 @@ function MusicList(props: Props) {
           {props.songs.map((song) => (
             <React.Fragment>
               {listItem(song)}
-              <Divider sx={{ bgcolor: "#212224ff" }} />
+              <Divider sx={{ backgroundColor: jbgrey }} />
             </React.Fragment>
           ))}
         </List>

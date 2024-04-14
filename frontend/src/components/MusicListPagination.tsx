@@ -1,5 +1,6 @@
 import React from "react";
 import { Container, Pagination } from "@mui/material";
+import { jbwhite } from "../utils/colors.tsx";
 
 interface Props {
   pageCount: number;
@@ -12,8 +13,8 @@ export function MusicListPagination(props: Props) {
       <Pagination
         color="primary"
         sx={{
-          button: { color: "#ffffff" },
-          div: { color: "#ffffff", opacity: 0.38 },
+          button: { color: jbwhite },
+          div: { color: jbwhite, opacity: 0.38 },
         }}
         count={props.pageCount}
         onChange={props.handlePageChange}

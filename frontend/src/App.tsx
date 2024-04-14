@@ -4,10 +4,30 @@ import Home from "./Home.tsx";
 import SpotifyAuth from "./SpotifyAuth.tsx";
 import Jukebox from "./components/Jukebox.tsx";
 import Playlist from "./components/Playlist.tsx";
+import { ThemeProvider, createTheme } from "@mui/material/styles";
+import { CssBaseline } from "@mui/material";
+import { jbdarkgrey, jbwhite } from "./utils/colors.tsx";
+
+const theme = createTheme({
+  palette: {
+    background: {
+      default: jbdarkgrey,
+    },
+  },
+  typography: {
+    body1: {
+      color: jbwhite,
+    },
+    h6: {
+      color: jbwhite,
+    },
+  },
+});
 
 function App() {
   return (
-    <div>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
       <Routes>
         <Route path="/" element={<SpotifyAuth />} />
         <Route path="/home" element={<Home />}>
@@ -15,7 +35,7 @@ function App() {
           <Route path="listen" element={<Playlist />} />
         </Route>
       </Routes>
-    </div>
+    </ThemeProvider>
   );
 }
 
