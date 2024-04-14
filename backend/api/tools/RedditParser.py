@@ -29,6 +29,8 @@ class RedditParser:
             normalized_titles = [title for title in self.__parse_hiphopheads_titles(titles) if title]
         if subreddit == SubName[Genre.ELECTRONIC]:
             normalized_titles = [title for title in self.__parse_electronicmusic_titles(titles) if title]
+        if subreddit == SubName[Genre.INDIE]:
+            normalized_titles = [title for title in self.__parse_indieheads_titles(titles) if title]
         created_timestamps = [str(int(submission.created_utc)) for submission in relevant_submissions]
         return [(data[0], data[1]) for data in zip(normalized_titles, created_timestamps)]
         
@@ -37,6 +39,9 @@ class RedditParser:
         return [self.__normalize(title) for title in titles]
 
     def __parse_electronicmusic_titles(self, titles: List[str]) -> List[str]:
+        return [self.__normalize(title) for title in titles]
+    
+    def __parse_indieheads_titles(self, titles: List[str]) -> List[str]:
         return [self.__normalize(title) for title in titles]
 
     def __normalize(self, title: str) -> Union[str, None]:

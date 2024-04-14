@@ -9,23 +9,31 @@ import {
   electronicGenreImage,
   generalGenreImage,
   hiphopGenreImage,
+  indieGenreImage,
 } from "../utils/images.tsx";
 import { _ } from "../utils/libs.tsx";
 import { Genre } from "./models/Genre.tsx";
+import { jbdarkgrey } from "../utils/colors.tsx";
 
 interface Props {
   setGenre: (genre: Genre) => void;
 }
 
 export function GenreSelection(props: Props) {
-  const images = [hiphopGenreImage, electronicGenreImage, generalGenreImage];
-  const headers = ["hiphop.", "electronic.", "general."];
+  const images = [
+    hiphopGenreImage,
+    electronicGenreImage,
+    indieGenreImage,
+    generalGenreImage,
+  ];
+  const headers = ["hiphop.", "electronic.", "indie.", "general."];
   const bodies = [
     "Browse tracks from r/hiphopheads",
     "Browse tracks from r/electronicmusic",
+    "Browse tracks from r/indieheads",
     "Browse tracks of any genre",
   ];
-  const genres = [Genre.HIPHOP, Genre.ELECTRONIC, Genre.GENERAL];
+  const genres = [Genre.HIPHOP, Genre.ELECTRONIC, Genre.INDIE, Genre.GENERAL];
 
   const card = (image, header: string, body: string, genre: Genre) => {
     return (
@@ -38,18 +46,11 @@ export function GenreSelection(props: Props) {
             image={image}
             alt="Image not loaded"
           />
-          <CardContent sx={{ bgcolor: "#141414ff", opacity: "90%" }}>
-            <Typography
-              sx={{ color: "#ffffff" }}
-              gutterBottom
-              variant="h5"
-              component="div"
-            >
+          <CardContent sx={{ backgroundColor: jbdarkgrey, opacity: "90%" }}>
+            <Typography gutterBottom variant="h5" component="div">
               {header}
             </Typography>
-            <Typography variant="body2" color="#a1a1a1ff">
-              {body}
-            </Typography>
+            <Typography variant="body2">{body}</Typography>
           </CardContent>
         </CardActionArea>
       </Card>
