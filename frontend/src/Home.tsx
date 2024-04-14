@@ -75,6 +75,7 @@ function Home() {
       <Box sx={{ height: "7%" }}>
         <AppHeader
           playlistSize={playlistSize}
+          currMode={mode}
           setGenre={setGenre}
           setMode={setMode}
         />

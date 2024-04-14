@@ -26,7 +26,7 @@ class PrawBot:
         )
 
     def update(self) -> None:
-        for genre in [Genre.HIPHOP, Genre.ELECTRONIC]:
+        for genre in [Genre.HIPHOP, Genre.ELECTRONIC, Genre.INDIE]:
             sub_name = SubName[genre]
             for title, timestamp in reddit_parser.parse(sub_name, self.__pull(sub_name)):
                 self.__push(title, genre, timestamp)

@@ -6,7 +6,7 @@ import Jukebox from "./components/Jukebox.tsx";
 import Playlist from "./components/Playlist.tsx";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import { CssBaseline } from "@mui/material";
-import { jbdarkgrey, jbwhite } from "./utils/colors.tsx";
+import { jbdarkgrey, jblightgrey, jbwhite } from "./utils/colors.tsx";
 
 const theme = createTheme({
   palette: {
@@ -16,6 +16,12 @@ const theme = createTheme({
   },
   typography: {
     body1: {
+      color: jbwhite,
+    },
+    body2: {
+      color: jblightgrey,
+    },
+    h5: {
       color: jbwhite,
     },
     h6: {

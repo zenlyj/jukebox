@@ -6,10 +6,11 @@ import { Badge, Button } from "@mui/material";
 import { Link } from "react-router-dom";
 import { Genre } from "./models/Genre.tsx";
 import { Mode } from "./models/Mode.tsx";
-import { jbblack, jbwhite } from "../utils/colors.tsx";
+import { jbblack, jblightgrey, jbwhite } from "../utils/colors.tsx";
 
 interface Props {
   playlistSize: number;
+  currMode: Mode;
   setGenre: (genre: Genre | null) => void;
   setMode: (mode: Mode) => void;
 }
@@ -20,8 +21,11 @@ function AppHeader(props: Props) {
     color: jbwhite,
   };
 
+  const getModeTextColor = (mode: Mode): string =>
+    props.currMode === mode ? jbwhite : jblightgrey;
+
   return (
-    <AppBar position="fixed" sx={{ bgcolor: jbblack }}>
+    <AppBar position="fixed" sx={{ backgroundColor: jbblack }}>
       <Toolbar>
         <Typography variant="h6" component="span">
           jukebox.
@@ -36,7 +40,11 @@ function AppHeader(props: Props) {
           }}
           sx={{ marginLeft: "2em", ...buttonStyle }}
         >
-          <Typography variant="h6" component="span">
+          <Typography
+            variant="h6"
+            component="span"
+            sx={{ color: getModeTextColor(Mode.DISCOVER) }}
+          >
             discover
           </Typography>
         </Button>
@@ -46,12 +54,18 @@ function AppHeader(props: Props) {
             component={Link}
             to="/home/listen"
             onClick={() => {
-              props.setGenre(Genre.ELECTRONIC);
+              props.setGenre(null);
               props.setMode(Mode.LISTEN);
             }}
             sx={buttonStyle}
           >
-            <Typography variant="h6" component="span">
+            <Typography
+              variant="h6"
+              component="span"
+              sx={{
+                color: getModeTextColor(Mode.LISTEN),
+              }}
+            >
               listen
             </Typography>
           </Button>
