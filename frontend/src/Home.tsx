@@ -36,7 +36,12 @@ function Home() {
           setIsLoggedIn(false);
         }
       });
-    } else if (token) {
+    }
+  }, []);
+
+  useEffect(() => {
+    const token = accessToken();
+    if (token) {
       refreshAccessToken(token).then((response: RefreshAccessTokenResponse) => {
         if (response.accessToken) {
           sessionStorage.setItem("accessToken", response.accessToken);
@@ -47,14 +52,13 @@ function Home() {
         }
       });
     }
-    if (isLoggedIn && playlistSize === 0) {
-      getPlaylistSize().then((response: GetPlaylistSizeResponse) => {
-        if (response.size !== playlistSize) {
-          setPlaylistSize(response.size);
-        }
-      });
-    }
   });
+
+  useEffect(() => {
+    getPlaylistSize().then((response: GetPlaylistSizeResponse) => {
+      setPlaylistSize(response.size);
+    });
+  }, [isLoggedIn]);
 
   const isDiscover = (): boolean => {
     return mode === Mode.DISCOVER;

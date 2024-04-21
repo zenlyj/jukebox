@@ -14,20 +14,21 @@ import { Box } from "@mui/material";
 function Jukebox() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [songCount, setSongCount] = useState<number>(0);
+  const [pageNum, setPageNum] = useState<number>(1);
   const { playlistSize, setPlaylistSize, genre } =
     useOutletContext<HomeContext>();
   const pageSize = 10;
 
   useEffect(() => {
-    if (songs.length === 0) {
-      getSongs(genre, 1, pageSize).then((response: GetSongsResponse) => {
-        if (response.songs.length !== 0) {
-          setSongs(response.songs);
-          setSongCount(response.songCount);
-        }
-      });
-    }
-  });
+    getRecommendedSongs(pageNum);
+  }, [pageNum]);
+
+  const getRecommendedSongs = (pageNum: number) => {
+    getSongs(genre, pageNum, pageSize).then((response: GetSongsResponse) => {
+      setSongs(response.songs);
+      setSongCount(response.songCount);
+    });
+  };
 
   const addToPlaylist = (songId: number): void => {
     addSongToPlaylist(songId).then((response: AddSongToPlaylistResponse) => {
@@ -41,12 +42,7 @@ function Jukebox() {
   };
 
   const handlePageChange = (event, pageNumber: number): void => {
-    getSongs(genre, pageNumber, pageSize).then((response: GetSongsResponse) => {
-      if (response.songs.length !== 0) {
-        setSongs(response.songs);
-        setSongCount(response.songCount);
-      }
-    });
+    setPageNum(pageNumber);
   };
 
   const getPageCount = (): number => {
@@ -70,6 +66,7 @@ function Jukebox() {
       />
       <MusicListPagination
         pageCount={getPageCount()}
+        pageNum={pageNum}
         handlePageChange={handlePageChange}
       />
     </Box>
