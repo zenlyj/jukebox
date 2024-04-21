@@ -17,30 +17,20 @@ function Playlist() {
   const [songs, setSongs] = useState<Song[]>([]);
   const [uris, setUris] = useState<string[]>([]);
   const [songCount, setSongCount] = useState<number>(0);
+  const [pageNum, setPageNum] = useState<number>(1);
   const { setPlaylistSize } = useOutletContext<HomeContext>();
   const pageSize = 10;
 
   useEffect(() => {
-    if (songs.length === 0) {
-      getPlaylistSongs();
-    }
-  });
+    getPlaylistSongs(pageNum);
+  }, [pageNum]);
 
-  const isSongChanged = (newSongs: Song[]): boolean => {
-    const currIds = new Set(songs.map((song) => song.id));
-    return songCount > pageSize
-      ? newSongs.some((song) => !currIds.has(song.id))
-      : newSongs.length !== songs.length;
-  };
-
-  const getPlaylistSongs = (): void => {
-    getPlaylist(1, pageSize).then((response: GetPlaylistResponse) => {
-      if (isSongChanged(response.songs)) {
-        setSongs(response.songs);
-        setUris(response.songs.map((song) => song.uri));
-        setSongCount(response.playlistSize);
-        setPlaylistSize(response.playlistSize);
-      }
+  const getPlaylistSongs = (pageNum: number): void => {
+    getPlaylist(pageNum, pageSize).then((response: GetPlaylistResponse) => {
+      setSongs(response.songs);
+      setUris(response.songs.map((song) => song.uri));
+      setSongCount(response.playlistSize);
+      setPlaylistSize(response.playlistSize);
     });
   };
 
@@ -48,7 +38,9 @@ function Playlist() {
     deletePlaylistSong(songId).then((response: DeletePlaylistSongResponse) => {
       if (response.isDeleted) {
         console.log("Successfully removed song from playlist");
-        getPlaylistSongs();
+        const updatedPageNum = songs.length === 1 ? pageNum - 1 : pageNum;
+        setPageNum(updatedPageNum);
+        getPlaylistSongs(updatedPageNum);
       } else {
         console.log("Failed to delete");
       }
@@ -56,14 +48,7 @@ function Playlist() {
   };
 
   const handlePageChange = (event, pageNumber: number): void => {
-    getPlaylist(pageNumber, pageSize).then((response: GetPlaylistResponse) => {
-      if (response.songs.length !== 0) {
-        setSongs(response.songs);
-        setUris(response.songs.map((song) => song.uri));
-        setSongCount(response.playlistSize);
-        setPlaylistSize(response.playlistSize);
-      }
-    });
+    setPageNum(pageNumber);
   };
 
   const getPageCount = (): number => {
@@ -85,6 +70,7 @@ function Playlist() {
           <MusicList songs={songs} onClickHandler={removePlaylistSong} />
           <MusicListPagination
             pageCount={getPageCount()}
+            pageNum={pageNum}
             handlePageChange={handlePageChange}
           />
         </Box>

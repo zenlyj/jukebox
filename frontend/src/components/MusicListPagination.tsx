@@ -4,6 +4,7 @@ import { jbwhite } from "../utils/colors.tsx";
 
 interface Props {
   pageCount: number;
+  pageNum: number;
   handlePageChange: (event, page: number) => void;
 }
 
@@ -17,6 +18,7 @@ export function MusicListPagination(props: Props) {
           div: { color: jbwhite, opacity: 0.38 },
         }}
         count={props.pageCount}
+        page={props.pageNum}
         onChange={props.handlePageChange}
       />
     </Container>
