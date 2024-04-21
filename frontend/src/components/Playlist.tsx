@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer } from "react";
 import { Box } from "@mui/material";
 import MusicList from "./MusicList.tsx";
 import { Song } from "./models/Song.tsx";
@@ -13,23 +13,76 @@ import { useOutletContext } from "react-router-dom";
 import { HomeContext } from "./models/HomeContext.tsx";
 import { MusicListPagination } from "./MusicListPagination.tsx";
 
+interface State {
+  songs: Song[];
+  uris: string[];
+  songCount: number;
+  pageNum: number;
+}
+
+enum ActionType {
+  GET_PLAYLIST_SONGS,
+  CHANGE_PAGE_NUMBER,
+}
+
+interface GetPlaylistSongsAction {
+  type: ActionType.GET_PLAYLIST_SONGS;
+  songs: Song[];
+  uris: string[];
+  songCount: number;
+  pageNum: number;
+}
+
+interface ChangePageNumberAction {
+  type: ActionType.CHANGE_PAGE_NUMBER;
+  pageNum: number;
+}
+
+type Action = GetPlaylistSongsAction | ChangePageNumberAction;
+
+function reducer(state: State, action: Action): State {
+  switch (action.type) {
+    case ActionType.GET_PLAYLIST_SONGS:
+      return {
+        ...state,
+        songs: action.songs,
+        uris: action.uris,
+        songCount: action.songCount,
+        pageNum: action.pageNum,
+      };
+    case ActionType.CHANGE_PAGE_NUMBER:
+      return {
+        ...state,
+        pageNum: action.pageNum,
+      };
+    default:
+      return state;
+  }
+}
+
 function Playlist() {
-  const [songs, setSongs] = useState<Song[]>([]);
-  const [uris, setUris] = useState<string[]>([]);
-  const [songCount, setSongCount] = useState<number>(0);
-  const [pageNum, setPageNum] = useState<number>(1);
+  const [state, dispatch] = useReducer(reducer, {
+    songs: [],
+    uris: [],
+    songCount: 0,
+    pageNum: 1,
+  });
   const { setPlaylistSize } = useOutletContext<HomeContext>();
   const pageSize = 10;
 
   useEffect(() => {
-    getPlaylistSongs(pageNum);
-  }, [pageNum]);
+    getPlaylistSongs(state.pageNum);
+  }, [state.pageNum]);
 
   const getPlaylistSongs = (pageNum: number): void => {
     getPlaylist(pageNum, pageSize).then((response: GetPlaylistResponse) => {
-      setSongs(response.songs);
-      setUris(response.songs.map((song) => song.uri));
-      setSongCount(response.playlistSize);
+      dispatch({
+        type: ActionType.GET_PLAYLIST_SONGS,
+        songs: response.songs,
+        uris: response.songs.map((song) => song.uri),
+        songCount: response.playlistSize,
+        pageNum: pageNum,
+      });
       setPlaylistSize(response.playlistSize);
     });
   };
@@ -38,8 +91,10 @@ function Playlist() {
     deletePlaylistSong(songId).then((response: DeletePlaylistSongResponse) => {
       if (response.isDeleted) {
         console.log("Successfully removed song from playlist");
-        const updatedPageNum = songs.length === 1 ? pageNum - 1 : pageNum;
-        setPageNum(updatedPageNum);
+        const updatedPageNum =
+          state.songs.length === 1 && state.pageNum > 1
+            ? state.pageNum - 1
+            : state.pageNum;
         getPlaylistSongs(updatedPageNum);
       } else {
         console.log("Failed to delete");
@@ -48,11 +103,11 @@ function Playlist() {
   };
 
   const handlePageChange = (event, pageNumber: number): void => {
-    setPageNum(pageNumber);
+    dispatch({ type: ActionType.CHANGE_PAGE_NUMBER, pageNum: pageNumber });
   };
 
   const getPageCount = (): number => {
-    return Math.ceil(songCount / pageSize);
+    return Math.ceil(state.songCount / pageSize);
   };
 
   return (
@@ -67,10 +122,10 @@ function Playlist() {
             justifyContent: "space-between",
           }}
         >
-          <MusicList songs={songs} onClickHandler={removePlaylistSong} />
+          <MusicList songs={state.songs} onClickHandler={removePlaylistSong} />
           <MusicListPagination
             pageCount={getPageCount()}
-            pageNum={pageNum}
+            pageNum={state.pageNum}
             handlePageChange={handlePageChange}
           />
         </Box>
@@ -83,7 +138,7 @@ function Playlist() {
           justifyContent: "flex-end",
         }}
       >
-        <SpotifyPlayer token={accessToken() ?? ""} uris={uris} />
+        <SpotifyPlayer token={accessToken() ?? ""} uris={state.uris} />
       </Box>
     </Box>
   );
