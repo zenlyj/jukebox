@@ -31,6 +31,7 @@ export async function refreshAccessToken(
   const url =
     `${SERVER_URL}/spotify/authorize/refresh/?` +
     new URLSearchParams({
+      expired_token: accessToken,
       refresh_token: refreshToken() ?? "",
     });
 

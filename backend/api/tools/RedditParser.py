@@ -22,25 +22,38 @@ class RedditParser:
     tag, tag_regex = "[fresh]", "\[fresh\]"
 
     def parse(self, subreddit: str, submissions: List[object]) -> List[RedditData]:
-        relevant_submissions = [submission for submission in submissions if self.tag in submission.title.lower()]
+        relevant_submissions = [
+            submission
+            for submission in submissions
+            if self.tag in submission.title.lower()
+        ]
         titles: List[str] = [submission.title for submission in relevant_submissions]
         normalized_titles = []
         if subreddit == SubName[Genre.HIPHOP]:
-            normalized_titles = [title for title in self.__parse_hiphopheads_titles(titles) if title]
+            normalized_titles = [
+                title for title in self.__parse_hiphopheads_titles(titles) if title
+            ]
         if subreddit == SubName[Genre.ELECTRONIC]:
-            normalized_titles = [title for title in self.__parse_electronicmusic_titles(titles) if title]
+            normalized_titles = [
+                title for title in self.__parse_electronicmusic_titles(titles) if title
+            ]
         if subreddit == SubName[Genre.INDIE]:
-            normalized_titles = [title for title in self.__parse_indieheads_titles(titles) if title]
-        created_timestamps = [str(int(submission.created_utc)) for submission in relevant_submissions]
-        return [(data[0], data[1]) for data in zip(normalized_titles, created_timestamps)]
-        
+            normalized_titles = [
+                title for title in self.__parse_indieheads_titles(titles) if title
+            ]
+        created_timestamps = [
+            str(int(submission.created_utc)) for submission in relevant_submissions
+        ]
+        return [
+            (data[0], data[1]) for data in zip(normalized_titles, created_timestamps)
+        ]
 
     def __parse_hiphopheads_titles(self, titles: List[str]) -> List[str]:
         return [self.__normalize(title) for title in titles]
 
     def __parse_electronicmusic_titles(self, titles: List[str]) -> List[str]:
         return [self.__normalize(title) for title in titles]
-    
+
     def __parse_indieheads_titles(self, titles: List[str]) -> List[str]:
         return [self.__normalize(title) for title in titles]
 

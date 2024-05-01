@@ -1,6 +1,10 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
+from api.database import get_db
 from api.services.SpotifyService import SpotifyService
+from api.services.PlaylistService import PlaylistService
+from api.repositories.PlaylistRepository import PlaylistRepository
 from api.tools.SpotifyParser import SpotifyParser
 
 from api.responses.SpotifyResponse import AuthorizeSpotifyResponse
@@ -19,9 +23,18 @@ def authorize_spotify(
 
 @router.get("/spotify/authorize/refresh/", response_model=ReauthorizeSpotifyResponse)
 def reauthorize_spotify(
-    refresh_token: str, spotify_service: SpotifyService = Depends(SpotifyService)
+    expired_token: str,
+    refresh_token: str,
+    spotify_service: SpotifyService = Depends(SpotifyService),
+    playlist_service: PlaylistService = Depends(PlaylistService),
+    db: Session = Depends(get_db),
+    playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
 ):
-    return spotify_service.refresh_token(refresh_token)
+    res = spotify_service.refresh_token(refresh_token)
+    playlist_service.update_session_id(
+        db, playlist_repo, expired_token, res.access_token
+    )
+    return res
 
 
 @router.get("/spotify/search/", response_model=SearchSpotifyResponse)

@@ -12,10 +12,6 @@ class DeleteSongFromPlaylistResponse(BaseModel):
     message: str
 
 
-class UpdateTokenCodeResponse(BaseModel):
-    message: str
-
-
 class GetPlaylistSizeResponse(BaseModel):
     size: int
     message: str

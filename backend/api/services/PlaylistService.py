@@ -10,7 +10,6 @@ from api.repositories.PlaylistRepository import PlaylistRepository
 from api.responses.SongResponse import GetSongResponse
 from api.responses.PlaylistResponse import AddSongToPlaylistResponse
 from api.responses.PlaylistResponse import DeleteSongFromPlaylistResponse
-from api.responses.PlaylistResponse import UpdateTokenCodeResponse
 from api.responses.PlaylistResponse import GetPlaylistSizeResponse
 
 
@@ -45,7 +44,7 @@ class PlaylistService:
                     album_cover=song.album_cover,
                     duration=song.duration,
                     genre_name=song.genre_name,
-                    timestamp=song.timestamp
+                    timestamp=song.timestamp,
                 )
             )
         playlist_size = playlist_repo.get_playlist_size(db, session)
@@ -81,17 +80,16 @@ class PlaylistService:
             raise HTTPException(status_code=422, detail="Failed to delete song")
         return self.__to_delete_song_from_playlist_response(song_id)
 
-    def update_token_code(
+    def update_session_id(
         self,
         db: Session,
         playlist_repo: PlaylistRepository,
-        old_access_token: str,
-        new_access_token: str,
-    ) -> UpdateTokenCodeResponse:
-        num_updated = playlist_repo.update_access_token_on_refresh(
-            db, old_access_token, new_access_token
+        old_session_id: str,
+        new_session_id: str,
+    ) -> None:
+        playlist_repo.update_session_id_on_refresh_token(
+            db, old_session_id, new_session_id
         )
-        return self.__to_update_token_code_response(num_updated)
 
     def __to_add_song_to_playlist_response(
         self,
@@ -109,12 +107,6 @@ class PlaylistService:
             song_id=song_id
         )
         return DeleteSongFromPlaylistResponse(message=message)
-
-    def __to_update_token_code_response(
-        self, num_updated: int
-    ) -> UpdateTokenCodeResponse:
-        message = "{num_updated} songs updated".format(num_updated=num_updated)
-        return UpdateTokenCodeResponse(message=message)
 
     def __to_get_playlist_size_response(
         self, playlist_size: int

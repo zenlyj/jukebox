@@ -8,7 +8,6 @@ from api.services.SongService import SongService
 from api.responses.SongResponse import GetSongResponse
 from api.responses.PlaylistResponse import AddSongToPlaylistResponse
 from api.responses.PlaylistResponse import DeleteSongFromPlaylistResponse
-from api.responses.PlaylistResponse import UpdateTokenCodeResponse
 from api.responses.PlaylistResponse import GetPlaylistSizeResponse
 
 router = APIRouter()
@@ -61,17 +60,4 @@ def remove_song_from_playlist(
 ):
     return playlist_service.remove_song_from_playlist(
         db, playlist_repo, session, song_id
-    )
-
-
-@router.put("/playlist/", response_model=UpdateTokenCodeResponse)
-def update_token_code(
-    old_access_token: str,
-    new_access_token: str,
-    db: Session = Depends(get_db),
-    playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
-    playlist_service: PlaylistService = Depends(PlaylistService),
-):
-    return playlist_service.update_token_code(
-        db, playlist_repo, old_access_token, new_access_token
     )

@@ -8,4 +8,8 @@ RedditData = Tuple[str, str]
 
 Genre = Enum("Genre", ["HIPHOP", "ELECTRONIC", "INDIE", "GENERAL"])
 
-SubName = {Genre.HIPHOP: "hiphopheads", Genre.ELECTRONIC: "electronicmusic", Genre.INDIE: "indieheads"}
+SubName = {
+    Genre.HIPHOP: "hiphopheads",
+    Genre.ELECTRONIC: "electronicmusic",
+    Genre.INDIE: "indieheads",
+}
