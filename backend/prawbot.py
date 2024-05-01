@@ -28,7 +28,9 @@ class PrawBot:
     def update(self) -> None:
         for genre in [Genre.HIPHOP, Genre.ELECTRONIC, Genre.INDIE]:
             sub_name = SubName[genre]
-            for title, timestamp in reddit_parser.parse(sub_name, self.__pull(sub_name)):
+            for title, timestamp in reddit_parser.parse(
+                sub_name, self.__pull(sub_name)
+            ):
                 self.__push(title, genre, timestamp)
 
     def __pull(self, subreddit: str) -> List[object]:
@@ -58,7 +60,7 @@ class PrawBot:
             if errorMessage == "The access token expired":
                 f = open("spotify_token.json", "r")
                 refresh_token = json.load(f)["refresh_token"]
-                self.__refresh_access_token(refresh_token)
+                self.__refresh_access_token(access_token, refresh_token)
                 self.__search_song(query)
             return None
 
@@ -66,8 +68,8 @@ class PrawBot:
         f = open("spotify_token.json", "r")
         return json.load(f)["access_token"]
 
-    def __refresh_access_token(self, refresh_token: str) -> None:
-        params = {"refresh_token": refresh_token}
+    def __refresh_access_token(self, expired_token: str, refresh_token: str) -> None:
+        params = {"expired_token": expired_token, "refresh_token": refresh_token}
         res = requests.get(f"{SERVER_URL}/spotify/authorize/refresh", params=params)
         if res.status_code != 200:
             raise Exception("Unable to refresh expired access token")

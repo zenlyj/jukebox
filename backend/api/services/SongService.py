@@ -35,7 +35,7 @@ class SongService:
                     album_cover=song.album_cover,
                     duration=song.duration,
                     genre_name=song.genre_name,
-                    timestamp=song.timestamp
+                    timestamp=song.timestamp,
                 )
             )
         song_count = song_repo.get_song_count(db, genre_name)
@@ -53,7 +53,7 @@ class SongService:
             duration=song.duration,
             spotify_id=song.spotify_id,
             genre_name=song.genre_name,
-            timestamp=song.timestamp
+            timestamp=song.timestamp,
         )
         song_repo.create_song(db, new_song)
 
@@ -70,7 +70,7 @@ class SongService:
             album_cover=new_song.album_cover,
             duration=new_song.duration,
             genre_name=song.genre_name,
-            timestamp=song.timestamp
+            timestamp=song.timestamp,
         )
         return self.__to_create_song_response(song_output)
 

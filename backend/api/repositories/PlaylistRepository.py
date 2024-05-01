@@ -40,13 +40,13 @@ class PlaylistRepository:
         db.commit()
         return num_deleted
 
-    def update_access_token_on_refresh(
-        db: Session, old_access_token: str, new_access_token: str
+    def update_session_id_on_refresh_token(
+        self, db: Session, old_session_id: str, new_session_id: str
     ) -> int:
         num_updated = (
             db.query(Playlist)
-            .filter(Playlist.session == old_access_token)
-            .update({Playlist.session: new_access_token})
+            .filter(Playlist.session == old_session_id)
+            .update({Playlist.session: new_session_id})
         )
         db.commit()
         return num_updated
