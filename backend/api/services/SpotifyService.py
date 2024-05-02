@@ -30,11 +30,14 @@ class SpotifyService:
         if response.status_code != 200:
             self.__handle_token_error(response)
         response_data = json.loads(response.text)
-        access_token, refresh_token = (
+        access_token, refresh_token, expires_in = (
             response_data["access_token"],
             response_data["refresh_token"],
+            response_data["expires_in"],
         )
-        return self.__to_authorize_spotify_response(access_token, refresh_token)
+        return self.__to_authorize_spotify_response(
+            access_token, refresh_token, expires_in
+        )
 
     def refresh_token(self, refresh_token: str) -> ReauthorizeSpotifyResponse:
         response = requests.post(
@@ -109,10 +112,12 @@ class SpotifyService:
         raise HTTPException(status_code=response.status_code, detail=error_message)
 
     def __to_authorize_spotify_response(
-        self, access_token: str, refresh_token: str
+        self, access_token: str, refresh_token: str, expires_in: int
     ) -> AuthorizeSpotifyResponse:
         return AuthorizeSpotifyResponse(
-            access_token=access_token, refresh_token=refresh_token
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=expires_in,
         )
 
     def __to_reauthorize_spotify_response(

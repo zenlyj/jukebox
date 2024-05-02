@@ -5,6 +5,7 @@ from typing import List
 class AuthorizeSpotifyResponse(BaseModel):
     access_token: str
     refresh_token: str
+    expires_in: int
 
 
 class ReauthorizeSpotifyResponse(BaseModel):
