@@ -3,7 +3,12 @@ import { Box } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import AppHeader from "./components/AppHeader.tsx";
 import { authorize, AuthorizeResponse } from "./api/Authorize.tsx";
-import { accessToken, authCode } from "./api/constants.tsx";
+import {
+  accessToken,
+  authCode,
+  expiresIn,
+  expireTime,
+} from "./api/constants.tsx";
 import {
   refreshAccessToken,
   RefreshAccessTokenResponse,
@@ -28,9 +33,15 @@ function Home() {
     const token = accessToken();
     if (!token && code) {
       authorize(code).then((response: AuthorizeResponse) => {
-        if (response.accessToken && response.refreshToken) {
+        if (
+          response.accessToken &&
+          response.refreshToken &&
+          response.expiresIn
+        ) {
           sessionStorage.setItem("accessToken", response.accessToken);
           sessionStorage.setItem("refreshToken", response.refreshToken);
+          sessionStorage.setItem("expiresIn", response.expiresIn?.toString());
+          sessionStorage.setItem("expireTime", getExpireTime().toString());
           setIsLoggedIn(true);
         } else {
           setIsLoggedIn(false);
@@ -40,11 +51,16 @@ function Home() {
   }, []);
 
   useEffect(() => {
+    if (!isAccessTokenExpired()) {
+      setIsLoggedIn(true);
+      return;
+    }
     const token = accessToken();
     if (token) {
       refreshAccessToken(token).then((response: RefreshAccessTokenResponse) => {
         if (response.accessToken) {
           sessionStorage.setItem("accessToken", response.accessToken);
+          sessionStorage.setItem("expireTime", getExpireTime().toString());
           setIsLoggedIn(true);
         } else {
           console.log("Unable to refresh access token");
@@ -59,6 +75,16 @@ function Home() {
       setPlaylistSize(response.size);
     });
   }, [isLoggedIn]);
+
+  const isAccessTokenExpired = (): boolean => {
+    const currTime = new Date().getTime() / 1000;
+    return currTime >= (expireTime() ?? 0);
+  };
+
+  const getExpireTime = (): number => {
+    const duration = expiresIn() ?? 0;
+    return new Date().getTime() / 1000 + duration;
+  };
 
   const isDiscover = (): boolean => {
     return mode === Mode.DISCOVER;
