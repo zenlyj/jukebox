@@ -1,4 +1,5 @@
-import { SERVER_URL, accessToken } from "./constants.tsx";
+import { getAccessToken } from "../utils/session.tsx";
+import { SERVER_URL } from "./constants.tsx";
 
 export interface AddSongToPlaylistResponse {
   isAdded: boolean;
@@ -13,7 +14,7 @@ export async function addSongToPlaylist(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      session: accessToken(),
+      session: getAccessToken(),
       song: songId,
     }),
   }).then((response: Response) => ({ isAdded: response.ok }));

@@ -7,11 +7,22 @@ import {
   DeletePlaylistSongResponse,
 } from "../api/DeletePlaylistSong.tsx";
 import { getPlaylist, GetPlaylistResponse } from "../api/GetPlaylist.tsx";
-import SpotifyPlayer from "react-spotify-web-playback";
-import { accessToken } from "../api/constants.tsx";
+import SpotifyPlayer, { Props } from "react-spotify-web-playback";
 import { useOutletContext } from "react-router-dom";
 import { HomeContext } from "./models/HomeContext.tsx";
 import { MusicListPagination } from "./MusicListPagination.tsx";
+import {
+  refreshAccessToken,
+  RefreshAccessTokenResponse,
+} from "../api/RefreshAccessToken.tsx";
+import {
+  getAccessToken,
+  getTokenExpireTime,
+  getTokenExpiresIn,
+  setAccessToken,
+  setTokenExpireTime,
+  setTokenExpiresIn,
+} from "../utils/session.tsx";
 
 interface State {
   songs: Song[];
@@ -110,6 +121,28 @@ function Playlist() {
     return Math.ceil(state.songCount / pageSize);
   };
 
+  const getOAuthToken: Props["getOAuthToken"] = async (callback) => {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      return;
+    }
+    if (getTokenExpireTime() > Date.now()) {
+      callback(accessToken);
+      return;
+    }
+    refreshAccessToken(accessToken).then(
+      (response: RefreshAccessTokenResponse) => {
+        if (!response.accessToken) {
+          return;
+        }
+        setAccessToken(response.accessToken);
+        setTokenExpiresIn(response.expiresIn);
+        setTokenExpireTime(Date.now() + getTokenExpiresIn() * 1000);
+        callback(response.accessToken);
+      }
+    );
+  };
+
   return (
     <Box sx={{ height: "100%" }}>
       <Box sx={{ height: "90%", overflow: "auto" }}>
@@ -138,7 +171,11 @@ function Playlist() {
           justifyContent: "flex-end",
         }}
       >
-        <SpotifyPlayer token={accessToken() ?? ""} uris={state.uris} />
+        <SpotifyPlayer
+          getOAuthToken={getOAuthToken}
+          token={getAccessToken() ?? ""}
+          uris={state.uris}
+        />
       </Box>
     </Box>
   );

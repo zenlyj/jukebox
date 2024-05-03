@@ -74,8 +74,12 @@ class PrawBot:
         if res.status_code != 200:
             raise Exception("Unable to refresh expired access token")
 
-        refreshed_token = json.loads(res.text)["access_token"]
-        updated = {"access_token": refreshed_token, "refresh_token": refresh_token}
+        response_data = json.loads(res.text)
+        updated = {
+            "access_token": response_data["access_token"],
+            "refresh_token": refresh_token,
+            "expires_in": response_data["expires_in"],
+        }
         with open("spotify_token.json", "w") as outfile:
             json.dump(updated, outfile)
 

@@ -48,8 +48,11 @@ class SpotifyService:
         if response.status_code != 200:
             self.__handle_token_error(response)
         response_data = json.loads(response.text)
-        access_token = response_data["access_token"]
-        return self.__to_reauthorize_spotify_response(access_token)
+        access_token, expires_in = (
+            response_data["access_token"],
+            response_data["expires_in"],
+        )
+        return self.__to_reauthorize_spotify_response(access_token, expires_in)
 
     def search(
         self,
@@ -85,7 +88,7 @@ class SpotifyService:
             "redirect_uri": f"{CLIENT_URL}/home/discover",
         }
 
-    def __refresh_token_data(self, refresh_token: str):
+    def __refresh_token_data(self, refresh_token: str) -> dict:
         return {"grant_type": "refresh_token", "refresh_token": refresh_token}
 
     def __token_headers(self) -> dict:
@@ -121,9 +124,11 @@ class SpotifyService:
         )
 
     def __to_reauthorize_spotify_response(
-        self, access_token: str
+        self, access_token: str, expires_in: int
     ) -> ReauthorizeSpotifyResponse:
-        return ReauthorizeSpotifyResponse(access_token=access_token)
+        return ReauthorizeSpotifyResponse(
+            access_token=access_token, expires_in=expires_in
+        )
 
     def __to_search_spotify_response(
         self,

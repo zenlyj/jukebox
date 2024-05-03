@@ -1,6 +1,7 @@
 import { Genre } from "../components/models/Genre.tsx";
 import { Song } from "../components/models/Song.tsx";
-import { SERVER_URL, accessToken } from "./constants.tsx";
+import { getAccessToken } from "../utils/session.tsx";
+import { SERVER_URL } from "./constants.tsx";
 
 export interface GetPlaylistResponse {
   songs: Song[];
@@ -51,7 +52,7 @@ export async function getPlaylist(
   pageSize: number
 ): Promise<GetPlaylistResponse> {
   const url =
-    `${SERVER_URL}/playlist/${accessToken()}/?` +
+    `${SERVER_URL}/playlist/${getAccessToken()}/?` +
     new URLSearchParams({
       page_num: `${pageNumber}`,
       page_size: `${pageSize}`,
