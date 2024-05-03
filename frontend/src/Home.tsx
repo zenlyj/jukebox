@@ -3,12 +3,7 @@ import { Box } from "@mui/material";
 import { CircularProgress } from "@mui/material";
 import AppHeader from "./components/AppHeader.tsx";
 import { authorize, AuthorizeResponse } from "./api/Authorize.tsx";
-import {
-  accessToken,
-  authCode,
-  expiresIn,
-  expireTime,
-} from "./api/constants.tsx";
+import { authCode } from "./api/constants.tsx";
 import {
   refreshAccessToken,
   RefreshAccessTokenResponse,
@@ -21,6 +16,15 @@ import {
   GetPlaylistSizeResponse,
   getPlaylistSize,
 } from "./api/GetPlaylistSize.tsx";
+import {
+  getAccessToken,
+  getTokenExpireTime,
+  getTokenExpiresIn,
+  setAccessToken,
+  setRefreshToken,
+  setTokenExpireTime,
+  setTokenExpiresIn,
+} from "./utils/session.tsx";
 
 function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
@@ -30,43 +34,62 @@ function Home() {
 
   useEffect(() => {
     const code = authCode();
-    const token = accessToken();
-    if (!token && code) {
-      authorize(code).then((response: AuthorizeResponse) => {
-        if (
-          response.accessToken &&
-          response.refreshToken &&
-          response.expiresIn
-        ) {
-          sessionStorage.setItem("accessToken", response.accessToken);
-          sessionStorage.setItem("refreshToken", response.refreshToken);
-          sessionStorage.setItem("expiresIn", response.expiresIn?.toString());
-          sessionStorage.setItem("expireTime", getExpireTime().toString());
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-        }
-      });
+    if (getAccessToken() || !code) {
+      return;
     }
+    authorize(code).then((response: AuthorizeResponse) => {
+      if (
+        !response.accessToken ||
+        !response.refreshToken ||
+        !response.expiresIn
+      ) {
+        setIsLoggedIn(false);
+        return;
+      }
+      setAccessToken(response.accessToken);
+      setRefreshToken(response.refreshToken);
+      setTokenExpiresIn(response.expiresIn);
+      setTokenExpireTime(Date.now() + getTokenExpiresIn() * 1000);
+      setIsLoggedIn(true);
+    });
   }, []);
 
   useEffect(() => {
-    if (!isAccessTokenExpired()) {
+    if (Date.now() < getTokenExpireTime()) {
       setIsLoggedIn(true);
       return;
     }
-    const token = accessToken();
-    if (token) {
-      refreshAccessToken(token).then((response: RefreshAccessTokenResponse) => {
-        if (response.accessToken) {
-          sessionStorage.setItem("accessToken", response.accessToken);
-          sessionStorage.setItem("expireTime", getExpireTime().toString());
-          setIsLoggedIn(true);
-        } else {
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      return;
+    }
+    refreshAccessToken(accessToken).then(
+      (response: RefreshAccessTokenResponse) => {
+        if (!response.accessToken) {
           console.log("Unable to refresh access token");
           setIsLoggedIn(false);
+          return;
         }
-      });
+        setAccessToken(response.accessToken);
+        setTokenExpiresIn(response.expiresIn);
+        setTokenExpireTime(Date.now() + getTokenExpiresIn() * 1000);
+        setIsLoggedIn(true);
+      }
+    );
+  });
+
+  useEffect(() => {
+    if (mode) {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    const names = url.pathname.split("/");
+    if (names.some((name) => name === Mode.DISCOVER)) {
+      setMode(Mode.DISCOVER);
+    }
+    if (names.some((name) => name === Mode.LISTEN)) {
+      setMode(Mode.LISTEN);
     }
   });
 
@@ -75,16 +98,6 @@ function Home() {
       setPlaylistSize(response.size);
     });
   }, [isLoggedIn]);
-
-  const isAccessTokenExpired = (): boolean => {
-    const currTime = new Date().getTime() / 1000;
-    return currTime >= (expireTime() ?? 0);
-  };
-
-  const getExpireTime = (): number => {
-    const duration = expiresIn() ?? 0;
-    return new Date().getTime() / 1000 + duration;
-  };
 
   const isDiscover = (): boolean => {
     return mode === Mode.DISCOVER;

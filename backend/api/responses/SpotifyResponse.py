@@ -10,6 +10,7 @@ class AuthorizeSpotifyResponse(BaseModel):
 
 class ReauthorizeSpotifyResponse(BaseModel):
     access_token: str
+    expires_in: int
 
 
 class SearchSpotifyResponse(BaseModel):
