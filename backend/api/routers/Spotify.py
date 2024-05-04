@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Header
 from sqlalchemy.orm import Session
 from typing import Union
+from typing_extensions import Annotated
 
 from api.database import get_db
 from api.services.SpotifyService import SpotifyService
@@ -10,6 +11,7 @@ from api.tools.SpotifyParser import SpotifyParser
 
 from api.responses.SpotifyResponse import SpotifyAuthorizationResponse
 from api.responses.SpotifyResponse import SearchSpotifyResponse
+from api.responses.SpotifyResponse import SpotifyUserProfileResponse
 
 from api.schemas.Authorization import AuthorizationCreate
 from api.schemas.Authorization import AuthorizationRefresh
@@ -34,7 +36,7 @@ def authorize_spotify(
         )
         return res
     else:
-        raise Exception("Invalid grant type")
+        raise HTTPException(status_code=400, detail="Invalid grant type")
 
 
 @router.get("/spotify/track/", response_model=SearchSpotifyResponse)
@@ -46,3 +48,11 @@ def search_spotify(
     spotify_parser: SpotifyParser = Depends(SpotifyParser),
 ):
     return spotify_service.search(query, query_type, access_token, spotify_parser)
+
+
+@router.get("/spotify/user-profile/", response_model=SpotifyUserProfileResponse)
+def get_user_profile(
+    Authorization: Annotated[Union[str, None], Header()],
+    spotify_service: SpotifyService = Depends(SpotifyService),
+):
+    return spotify_service.get_user_profile_info(Authorization)

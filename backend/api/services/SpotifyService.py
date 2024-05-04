@@ -9,6 +9,7 @@ import os
 
 from api.responses.SpotifyResponse import SpotifyAuthorizationResponse
 from api.responses.SpotifyResponse import SearchSpotifyResponse
+from api.responses.SpotifyResponse import SpotifyUserProfileResponse
 from api.tools.SpotifyParser import SpotifyParser
 
 load_dotenv()
@@ -17,6 +18,7 @@ SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
 TOKEN_ENDPOINT = "https://accounts.spotify.com/api/token"
 SEARCH_ENDPOINT = "https://api.spotify.com/v1/search"
+USER_ENDPOINT = "https://api.spotify.com/v1/me"
 
 
 class SpotifyService:
@@ -68,8 +70,8 @@ class SpotifyService:
             params=self.__search_params(query, query_type),
         )
         if response.status_code != 200:
-            errorMessage = json.loads(response.text)["error"]["message"]
-            raise HTTPException(status_code=response.status_code, detail=errorMessage)
+            error_message = json.loads(response.text)["error"]["message"]
+            raise HTTPException(status_code=response.status_code, detail=error_message)
         response_data = spotify_parser.parse_spotify_search(response.text, query)
         if not response_data:
             raise HTTPException(status_code=404, detail="Track not found on Spotify")
@@ -81,6 +83,17 @@ class SpotifyService:
         return self.__to_search_spotify_response(
             name, artist_names, uri, album_cover, duration, spotify_id
         )
+
+    def get_user_profile_info(self, access_token: str) -> SpotifyUserProfileResponse:
+        response = requests.get(
+            USER_ENDPOINT, headers=self.__user_headers(access_token)
+        )
+        if response.status_code != 200:
+            error_message = json.loads(response.text)["error"]["message"]
+            raise HTTPException(status_code=response.status_code, detail=error_message)
+        response_data = json.loads(response.text)
+        name, user_id = response_data["display_name"], response_data["id"]
+        return self.__to_spotify_user_profile_response(name, user_id)
 
     def __get_token_data(self, authorization_code: str) -> dict:
         return {
@@ -115,6 +128,9 @@ class SpotifyService:
         error_message = json.loads(response.text)["error_description"]
         raise HTTPException(status_code=response.status_code, detail=error_message)
 
+    def __user_headers(self, access_token: str) -> dict:
+        return {"Authorization": f"Bearer {access_token}"}
+
     def __to_spotify_authorization_response(
         self, access_token: str, refresh_token: str, expires_in: int
     ) -> SpotifyAuthorizationResponse:
@@ -141,3 +157,8 @@ class SpotifyService:
             duration=duration,
             spotify_id=spotify_id,
         )
+
+    def __to_spotify_user_profile_response(
+        self, name: str, user_id: str
+    ) -> SpotifyUserProfileResponse:
+        return SpotifyUserProfileResponse(name=name, user_id=user_id)

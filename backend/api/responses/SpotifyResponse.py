@@ -15,3 +15,8 @@ class SearchSpotifyResponse(BaseModel):
     album_cover: str
     duration: int
     spotify_id: str
+
+
+class SpotifyUserProfileResponse(BaseModel):
+    name: str
+    user_id: str
