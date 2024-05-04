@@ -21,11 +21,17 @@ import {
   getRefreshToken,
   getTokenExpireTime,
   getTokenExpiresIn,
+  getUserInfo,
   setAccessToken,
   setRefreshToken,
   setTokenExpireTime,
   setTokenExpiresIn,
+  setUserInfo,
 } from "./utils/session.tsx";
+import {
+  GetUserProfileResponse,
+  getUserProfile,
+} from "./api/GetUserProfile.tsx";
 
 function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState<Boolean>(false);
@@ -93,6 +99,19 @@ function Home() {
     if (names.some((name) => name === Mode.LISTEN)) {
       setMode(Mode.LISTEN);
     }
+  });
+
+  useEffect(() => {
+    if (getUserInfo()) {
+      return;
+    }
+    const accessToken = getAccessToken();
+    if (!accessToken) {
+      return;
+    }
+    getUserProfile(accessToken).then((response: GetUserProfileResponse) => {
+      setUserInfo(response.name, response.userId);
+    });
   });
 
   useEffect(() => {
