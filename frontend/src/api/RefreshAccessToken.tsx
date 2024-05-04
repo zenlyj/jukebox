@@ -1,4 +1,3 @@
-import { getRefreshToken } from "../utils/session.tsx";
 import { SERVER_URL } from "./constants.tsx";
 
 interface ServerResponse {
@@ -22,15 +21,20 @@ export interface RefreshAccessTokenResponse {
 }
 
 export async function refreshAccessToken(
-  accessToken: string
+  accessToken: string,
+  refreshToken: string
 ): Promise<RefreshAccessTokenResponse> {
-  const url =
-    `${SERVER_URL}/spotify/authorize/refresh/?` +
-    new URLSearchParams({
-      expired_token: accessToken,
-      refresh_token: getRefreshToken() ?? "",
-    });
-  return fetch(url)
+  return fetch(`${SERVER_URL}/spotify/authorization/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      grant_type: "refresh_token",
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    }),
+  })
     .then((response: Response) => (response.ok ? response.json() : null))
     .then((response: ServerResponse | null) => mapServerResponse(response));
 }

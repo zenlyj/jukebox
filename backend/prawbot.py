@@ -50,7 +50,7 @@ class PrawBot:
     def __search_song(self, query: str) -> dict:
         access_token = self.__get_access_token()
         params = {"query": query, "query_type": "track", "access_token": access_token}
-        res = requests.get(f"{SERVER_URL}/spotify/search", params=params)
+        res = requests.get(f"{SERVER_URL}/spotify/track", params=params)
 
         if res.status_code == 200:
             return json.loads(res.text)
@@ -69,8 +69,15 @@ class PrawBot:
         return json.load(f)["access_token"]
 
     def __refresh_access_token(self, expired_token: str, refresh_token: str) -> None:
-        params = {"expired_token": expired_token, "refresh_token": refresh_token}
-        res = requests.get(f"{SERVER_URL}/spotify/authorize/refresh", params=params)
+        auth_data = {
+            "grant_type": "refresh_token",
+            "authorization_code": None,
+            "access_token": expired_token,
+            "refresh_token": refresh_token,
+        }
+        res = requests.post(
+            f"{SERVER_URL}/spotify/authorization/", data=json.dumps(auth_data)
+        )
         if res.status_code != 200:
             raise Exception("Unable to refresh expired access token")
 

@@ -17,6 +17,7 @@ import {
 } from "../api/RefreshAccessToken.tsx";
 import {
   getAccessToken,
+  getRefreshToken,
   getTokenExpireTime,
   getTokenExpiresIn,
   setAccessToken,
@@ -123,14 +124,15 @@ function Playlist() {
 
   const getOAuthToken: Props["getOAuthToken"] = async (callback) => {
     const accessToken = getAccessToken();
-    if (!accessToken) {
+    const refreshToken = getRefreshToken();
+    if (!accessToken || !refreshToken) {
       return;
     }
     if (getTokenExpireTime() > Date.now()) {
       callback(accessToken);
       return;
     }
-    refreshAccessToken(accessToken).then(
+    refreshAccessToken(accessToken, refreshToken).then(
       (response: RefreshAccessTokenResponse) => {
         if (!response.accessToken) {
           return;

@@ -2,14 +2,9 @@ from pydantic import BaseModel
 from typing import List
 
 
-class AuthorizeSpotifyResponse(BaseModel):
+class SpotifyAuthorizationResponse(BaseModel):
     access_token: str
     refresh_token: str
-    expires_in: int
-
-
-class ReauthorizeSpotifyResponse(BaseModel):
-    access_token: str
     expires_in: int
 
 
