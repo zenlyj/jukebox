@@ -20,6 +20,7 @@ import {
   getRefreshToken,
   getTokenExpireTime,
   getTokenExpiresIn,
+  getUserInfo,
   setAccessToken,
   setTokenExpireTime,
   setTokenExpiresIn,
@@ -87,31 +88,43 @@ function Playlist() {
   }, [state.pageNum]);
 
   const getPlaylistSongs = (pageNum: number): void => {
-    getPlaylist(pageNum, pageSize).then((response: GetPlaylistResponse) => {
-      dispatch({
-        type: ActionType.GET_PLAYLIST_SONGS,
-        songs: response.songs,
-        uris: response.songs.map((song) => song.uri),
-        songCount: response.playlistSize,
-        pageNum: pageNum,
-      });
-      setPlaylistSize(response.playlistSize);
-    });
+    const spotifyUserId = getUserInfo()?.userId;
+    if (!spotifyUserId) {
+      return;
+    }
+    getPlaylist(spotifyUserId, pageNum, pageSize).then(
+      (response: GetPlaylistResponse) => {
+        dispatch({
+          type: ActionType.GET_PLAYLIST_SONGS,
+          songs: response.songs,
+          uris: response.songs.map((song) => song.uri),
+          songCount: response.playlistSize,
+          pageNum: pageNum,
+        });
+        setPlaylistSize(response.playlistSize);
+      }
+    );
   };
 
   const removePlaylistSong = (songId: number): void => {
-    deletePlaylistSong(songId).then((response: DeletePlaylistSongResponse) => {
-      if (response.isDeleted) {
-        console.log("Successfully removed song from playlist");
-        const updatedPageNum =
-          state.songs.length === 1 && state.pageNum > 1
-            ? state.pageNum - 1
-            : state.pageNum;
-        getPlaylistSongs(updatedPageNum);
-      } else {
-        console.log("Failed to delete");
+    const spotifyUserId = getUserInfo()?.userId;
+    if (!spotifyUserId) {
+      return;
+    }
+    deletePlaylistSong(spotifyUserId, songId).then(
+      (response: DeletePlaylistSongResponse) => {
+        if (response.isDeleted) {
+          console.log("Successfully removed song from playlist");
+          const updatedPageNum =
+            state.songs.length === 1 && state.pageNum > 1
+              ? state.pageNum - 1
+              : state.pageNum;
+          getPlaylistSongs(updatedPageNum);
+        } else {
+          console.log("Failed to delete");
+        }
       }
-    });
+    );
   };
 
   const handlePageChange = (event, pageNumber: number): void => {

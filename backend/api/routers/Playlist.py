@@ -13,9 +13,9 @@ from api.responses.PlaylistResponse import GetPlaylistSizeResponse
 router = APIRouter()
 
 
-@router.get("/playlist/{session}", response_model=GetSongResponse)
+@router.get("/playlist/", response_model=GetSongResponse)
 def get_playlist_songs(
-    session: str,
+    spotify_user_id: str,
     page_num: int,
     page_size: int,
     db: Session = Depends(get_db),
@@ -24,18 +24,18 @@ def get_playlist_songs(
     song_service: SongService = Depends(SongService),
 ):
     return playlist_service.get_playlist_songs(
-        db, playlist_repo, song_service, session, page_num, page_size
+        db, playlist_repo, song_service, spotify_user_id, page_num, page_size
     )
 
 
-@router.get("/playlist/{session}/size", response_model=GetPlaylistSizeResponse)
+@router.get("/playlist/size/", response_model=GetPlaylistSizeResponse)
 def get_playlist_size(
-    session: str,
+    spotify_user_id: str,
     db: Session = Depends(get_db),
     playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
     playlist_service: PlaylistService = Depends(PlaylistService),
 ):
-    return playlist_service.get_playlist_size(db, playlist_repo, session)
+    return playlist_service.get_playlist_size(db, playlist_repo, spotify_user_id)
 
 
 @router.post("/playlist/", response_model=AddSongToPlaylistResponse)
@@ -48,16 +48,14 @@ def add_song_to_playlist(
     return playlist_service.add_song_to_playlist(db, playlist_repo, playlist)
 
 
-@router.delete(
-    "/playlist/{session}/{song_id}", response_model=DeleteSongFromPlaylistResponse
-)
+@router.delete("/playlist/", response_model=DeleteSongFromPlaylistResponse)
 def remove_song_from_playlist(
-    session: str,
+    spotify_user_id: str,
     song_id: int,
     db: Session = Depends(get_db),
     playlist_repo: PlaylistRepository = Depends(PlaylistRepository),
     playlist_service: PlaylistService = Depends(PlaylistService),
 ):
     return playlist_service.remove_song_from_playlist(
-        db, playlist_repo, session, song_id
+        db, playlist_repo, spotify_user_id, song_id
     )

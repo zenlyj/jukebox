@@ -19,12 +19,14 @@ class PlaylistService:
         db: Session,
         playlist_repo: PlaylistRepository,
         song_service: SongService,
-        session: str,
+        spotify_user_id: str,
         page_num: int,
         page_size: int,
     ) -> GetSongResponse:
         offset, limit = (page_num - 1) * page_size, page_size
-        playlist_songs = playlist_repo.get_playlist_songs(db, session, offset, limit)
+        playlist_songs = playlist_repo.get_playlist_songs(
+            db, spotify_user_id, offset, limit
+        )
         playlist_song_artists = playlist_repo.get_playlist_song_artists(
             db, set(song.id for song in playlist_songs)
         )
@@ -47,56 +49,55 @@ class PlaylistService:
                     timestamp=song.timestamp,
                 )
             )
-        playlist_size = playlist_repo.get_playlist_size(db, session)
+        playlist_size = playlist_repo.get_playlist_size(db, spotify_user_id)
         return song_service.to_get_song_response(playlist_song_outputs, playlist_size)
 
     def get_playlist_size(
-        self, db: Session, playlist_repo: PlaylistRepository, session: str
+        self, db: Session, playlist_repo: PlaylistRepository, spotify_user_id: str
     ) -> GetPlaylistSizeResponse:
-        size = playlist_repo.get_playlist_size(db, session)
+        size = playlist_repo.get_playlist_size(db, spotify_user_id)
         return self.__to_get_playlist_size_response(size)
 
     def add_song_to_playlist(
         self, db: Session, playlist_repo: PlaylistRepository, playlist: PlaylistCreate
     ) -> AddSongToPlaylistResponse:
-        if playlist_repo.is_song_exist(db, playlist.session, playlist.song):
+        if playlist_repo.is_song_exist(db, playlist.spotify_user_id, playlist.song_id):
             raise HTTPException(
                 status_code=422, detail="Song already added to playlist!"
             )
-        new_playlist_song = Playlist(session=playlist.session, song=playlist.song)
+        new_playlist_song = Playlist(
+            spotify_user_id=playlist.spotify_user_id, song_id=playlist.song_id
+        )
         playlist_repo.add_song_to_playlist(db, new_playlist_song)
         playlist_response_input = playlist_schemas.Playlist(
             id=new_playlist_song.id,
-            session=new_playlist_song.session,
-            song=new_playlist_song.song,
+            spotify_user_id=new_playlist_song.spotify_user_id,
+            song_id=new_playlist_song.song_id,
         )
         return self.__to_add_song_to_playlist_response(playlist_response_input)
 
     def remove_song_from_playlist(
-        self, db: Session, playlist_repo: PlaylistRepository, session: str, song_id: int
-    ) -> DeleteSongFromPlaylistResponse:
-        num_deleted = playlist_repo.remove_song_from_playlist(db, session, song_id)
-        if num_deleted == 0:
-            raise HTTPException(status_code=422, detail="Failed to delete song")
-        return self.__to_delete_song_from_playlist_response(song_id)
-
-    def update_session_id(
         self,
         db: Session,
         playlist_repo: PlaylistRepository,
-        old_session_id: str,
-        new_session_id: str,
-    ) -> None:
-        playlist_repo.update_session_id_on_refresh_token(
-            db, old_session_id, new_session_id
+        spotify_user_id: str,
+        song_id: int,
+    ) -> DeleteSongFromPlaylistResponse:
+        num_deleted = playlist_repo.remove_song_from_playlist(
+            db, spotify_user_id, song_id
         )
+        if num_deleted == 0:
+            raise HTTPException(status_code=422, detail="Failed to delete song")
+        return self.__to_delete_song_from_playlist_response(song_id)
 
     def __to_add_song_to_playlist_response(
         self,
         playlist_song: playlist_schemas.Playlist,
     ) -> AddSongToPlaylistResponse:
         return AddSongToPlaylistResponse(
-            id=playlist_song.id, session=playlist_song.session, song=playlist_song.song
+            id=playlist_song.id,
+            spotify_user_id=playlist_song.spotify_user_id,
+            song_id=playlist_song.song_id,
         )
 
     def __to_delete_song_from_playlist_response(

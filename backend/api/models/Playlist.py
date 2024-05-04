@@ -7,5 +7,5 @@ class Playlist(Base):
     __tablename__ = "playlist"
 
     id = Column(Integer, primary_key=True, index=True)
-    session = Column(String)
-    song = Column(Integer, ForeignKey("songs.id"))
+    spotify_user_id = Column(String)
+    song_id = Column(Integer, ForeignKey("songs.id"))

@@ -1,4 +1,3 @@
-import { getAccessToken } from "../utils/session.tsx";
 import { SERVER_URL } from "./constants.tsx";
 
 export interface AddSongToPlaylistResponse {
@@ -6,6 +5,7 @@ export interface AddSongToPlaylistResponse {
 }
 
 export async function addSongToPlaylist(
+  spotifyUserId: string,
   songId: number
 ): Promise<AddSongToPlaylistResponse> {
   return fetch(`${SERVER_URL}/playlist/`, {
@@ -14,8 +14,8 @@ export async function addSongToPlaylist(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      session: getAccessToken(),
-      song: songId,
+      spotify_user_id: spotifyUserId,
+      song_id: songId,
     }),
   }).then((response: Response) => ({ isAdded: response.ok }));
 }

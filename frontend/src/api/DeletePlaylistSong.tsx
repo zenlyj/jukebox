@@ -1,4 +1,3 @@
-import { getAccessToken } from "../utils/session.tsx";
 import { SERVER_URL } from "./constants.tsx";
 
 export interface DeletePlaylistSongResponse {
@@ -6,9 +5,16 @@ export interface DeletePlaylistSongResponse {
 }
 
 export async function deletePlaylistSong(
+  spotifyUserId: string,
   songId: number
 ): Promise<DeletePlaylistSongResponse> {
-  return fetch(`${SERVER_URL}/playlist/${getAccessToken()}/${songId}`, {
+  const url =
+    `${SERVER_URL}/playlist/?` +
+    new URLSearchParams({
+      spotify_user_id: spotifyUserId,
+      song_id: `${songId}`,
+    });
+  return fetch(url, {
     method: "DELETE",
   }).then((response: Response) => ({ isDeleted: response.ok }));
 }
