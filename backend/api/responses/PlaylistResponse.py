@@ -3,8 +3,8 @@ from pydantic import BaseModel
 
 class AddSongToPlaylistResponse(BaseModel):
     id: int
-    session: str
-    song: int
+    spotify_user_id: str
+    song_id: int
     message: str = "Successfully added to playlist!"
 
 

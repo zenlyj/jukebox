@@ -11,11 +11,17 @@ from typing import Set
 
 class PlaylistRepository:
     def get_playlist_songs(
-        self, db: Session, session: str, offset: int, limit: int
+        self, db: Session, spotify_user_id: str, offset: int, limit: int
     ) -> List[Song]:
         return (
             db.query(Song)
-            .join(Playlist, and_(Song.id == Playlist.song, Playlist.session == session))
+            .join(
+                Playlist,
+                and_(
+                    Song.id == Playlist.song_id,
+                    Playlist.spotify_user_id == spotify_user_id,
+                ),
+            )
             .offset(offset)
             .limit(limit)
             .all()
@@ -31,33 +37,32 @@ class PlaylistRepository:
         db.commit()
         db.refresh(playlist_song)
 
-    def remove_song_from_playlist(self, db: Session, session: str, song_id: int) -> int:
+    def remove_song_from_playlist(
+        self, db: Session, spotify_user_id: str, song_id: int
+    ) -> int:
         num_deleted = (
             db.query(Playlist)
-            .filter(Playlist.song == song_id, Playlist.session == session)
+            .filter(
+                Playlist.song_id == song_id, Playlist.spotify_user_id == spotify_user_id
+            )
             .delete()
         )
         db.commit()
         return num_deleted
 
-    def update_session_id_on_refresh_token(
-        self, db: Session, old_session_id: str, new_session_id: str
-    ) -> int:
-        num_updated = (
-            db.query(Playlist)
-            .filter(Playlist.session == old_session_id)
-            .update({Playlist.session: new_session_id})
-        )
-        db.commit()
-        return num_updated
-
-    def is_song_exist(self, db: Session, session: str, song_id: int) -> bool:
+    def is_song_exist(self, db: Session, spotify_user_id: str, song_id: int) -> bool:
         return (
             db.query(Playlist)
-            .filter(Playlist.session == session, Playlist.song == song_id)
+            .filter(
+                Playlist.spotify_user_id == spotify_user_id, Playlist.song_id == song_id
+            )
             .count()
             > 0
         )
 
-    def get_playlist_size(self, db: Session, session: str) -> int:
-        return db.query(Playlist).filter(Playlist.session == session).count()
+    def get_playlist_size(self, db: Session, spotify_user_id: str) -> int:
+        return (
+            db.query(Playlist)
+            .filter(Playlist.spotify_user_id == spotify_user_id)
+            .count()
+        )

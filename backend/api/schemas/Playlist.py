@@ -2,8 +2,8 @@ from pydantic import BaseModel
 
 
 class PlaylistBase(BaseModel):
-    session: str
-    song: int
+    spotify_user_id: str
+    song_id: int
 
 
 class PlaylistCreate(PlaylistBase):

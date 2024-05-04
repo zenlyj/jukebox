@@ -10,6 +10,7 @@ import {
 import { useOutletContext } from "react-router-dom";
 import { HomeContext } from "./models/HomeContext.tsx";
 import { Box } from "@mui/material";
+import { getUserInfo } from "../utils/session.tsx";
 
 interface State {
   songs: Song[];
@@ -79,14 +80,20 @@ function Jukebox() {
   };
 
   const addToPlaylist = (songId: number): void => {
-    addSongToPlaylist(songId).then((response: AddSongToPlaylistResponse) => {
-      if (response.isAdded) {
-        console.log("Successfully added to playlist");
-        setPlaylistSize(playlistSize + 1);
-      } else {
-        console.log("Failed to add to playlist");
+    const spotifyUserId = getUserInfo()?.userId;
+    if (!spotifyUserId) {
+      return;
+    }
+    addSongToPlaylist(spotifyUserId, songId).then(
+      (response: AddSongToPlaylistResponse) => {
+        if (response.isAdded) {
+          console.log("Successfully added to playlist");
+          setPlaylistSize(playlistSize + 1);
+        } else {
+          console.log("Failed to add to playlist");
+        }
       }
-    });
+    );
   };
 
   const handlePageChange = (event, pageNumber: number): void => {

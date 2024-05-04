@@ -44,21 +44,29 @@ function Home() {
     if (getAccessToken() || !code) {
       return;
     }
-    authorize(code).then((response: AuthorizeResponse) => {
-      if (
-        !response.accessToken ||
-        !response.refreshToken ||
-        !response.expiresIn
-      ) {
-        setIsLoggedIn(false);
-        return;
-      }
-      setAccessToken(response.accessToken);
-      setRefreshToken(response.refreshToken);
-      setTokenExpiresIn(response.expiresIn);
-      setTokenExpireTime(Date.now() + getTokenExpiresIn() * 1000);
-      setIsLoggedIn(true);
-    });
+    authorize(code)
+      .then((response: AuthorizeResponse) => {
+        if (
+          !response.accessToken ||
+          !response.refreshToken ||
+          !response.expiresIn
+        ) {
+          setIsLoggedIn(false);
+          return null;
+        }
+        setAccessToken(response.accessToken);
+        setRefreshToken(response.refreshToken);
+        setTokenExpiresIn(response.expiresIn);
+        setTokenExpireTime(Date.now() + getTokenExpiresIn() * 1000);
+        return getUserProfile(response.accessToken);
+      })
+      .then((response: GetUserProfileResponse | null) => {
+        if (!response) {
+          return null;
+        }
+        setUserInfo(response.name, response.userId);
+        setIsLoggedIn(true);
+      });
   }, []);
 
   useEffect(() => {
@@ -102,20 +110,11 @@ function Home() {
   });
 
   useEffect(() => {
-    if (getUserInfo()) {
+    const spotifyUserId = getUserInfo()?.userId;
+    if (!spotifyUserId) {
       return;
     }
-    const accessToken = getAccessToken();
-    if (!accessToken) {
-      return;
-    }
-    getUserProfile(accessToken).then((response: GetUserProfileResponse) => {
-      setUserInfo(response.name, response.userId);
-    });
-  });
-
-  useEffect(() => {
-    getPlaylistSize().then((response: GetPlaylistSizeResponse) => {
+    getPlaylistSize(spotifyUserId).then((response: GetPlaylistSizeResponse) => {
       setPlaylistSize(response.size);
     });
   }, [isLoggedIn]);

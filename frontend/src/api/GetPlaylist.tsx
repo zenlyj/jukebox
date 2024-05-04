@@ -1,6 +1,5 @@
 import { Genre } from "../components/models/Genre.tsx";
 import { Song } from "../components/models/Song.tsx";
-import { getAccessToken } from "../utils/session.tsx";
 import { SERVER_URL } from "./constants.tsx";
 
 export interface GetPlaylistResponse {
@@ -48,15 +47,18 @@ const mapServerResponse = (
 };
 
 export async function getPlaylist(
+  spotifyUserId: string,
   pageNumber: number,
   pageSize: number
 ): Promise<GetPlaylistResponse> {
   const url =
-    `${SERVER_URL}/playlist/${getAccessToken()}/?` +
+    `${SERVER_URL}/playlist/?` +
     new URLSearchParams({
+      spotify_user_id: spotifyUserId,
       page_num: `${pageNumber}`,
       page_size: `${pageSize}`,
     });
+  console.log(url);
   return fetch(url)
     .then((response: Response) => (response.ok ? response.json() : null))
     .then((response: ServerResponse | null) => mapServerResponse(response));
