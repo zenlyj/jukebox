@@ -7,8 +7,7 @@ import base64
 import json
 import os
 
-from api.responses.SpotifyResponse import AuthorizeSpotifyResponse
-from api.responses.SpotifyResponse import ReauthorizeSpotifyResponse
+from api.responses.SpotifyResponse import SpotifyAuthorizationResponse
 from api.responses.SpotifyResponse import SearchSpotifyResponse
 from api.tools.SpotifyParser import SpotifyParser
 
@@ -21,7 +20,7 @@ SEARCH_ENDPOINT = "https://api.spotify.com/v1/search"
 
 
 class SpotifyService:
-    def get_token(self, authorization_code: str) -> AuthorizeSpotifyResponse:
+    def create_token(self, authorization_code: str) -> SpotifyAuthorizationResponse:
         response = requests.post(
             TOKEN_ENDPOINT,
             headers=self.__token_headers(),
@@ -35,11 +34,11 @@ class SpotifyService:
             response_data["refresh_token"],
             response_data["expires_in"],
         )
-        return self.__to_authorize_spotify_response(
+        return self.__to_spotify_authorization_response(
             access_token, refresh_token, expires_in
         )
 
-    def refresh_token(self, refresh_token: str) -> ReauthorizeSpotifyResponse:
+    def refresh_token(self, refresh_token: str) -> SpotifyAuthorizationResponse:
         response = requests.post(
             TOKEN_ENDPOINT,
             headers=self.__token_headers(),
@@ -52,7 +51,9 @@ class SpotifyService:
             response_data["access_token"],
             response_data["expires_in"],
         )
-        return self.__to_reauthorize_spotify_response(access_token, expires_in)
+        return self.__to_spotify_authorization_response(
+            access_token, refresh_token, expires_in
+        )
 
     def search(
         self,
@@ -114,20 +115,13 @@ class SpotifyService:
         error_message = json.loads(response.text)["error_description"]
         raise HTTPException(status_code=response.status_code, detail=error_message)
 
-    def __to_authorize_spotify_response(
+    def __to_spotify_authorization_response(
         self, access_token: str, refresh_token: str, expires_in: int
-    ) -> AuthorizeSpotifyResponse:
-        return AuthorizeSpotifyResponse(
+    ) -> SpotifyAuthorizationResponse:
+        return SpotifyAuthorizationResponse(
             access_token=access_token,
             refresh_token=refresh_token,
             expires_in=expires_in,
-        )
-
-    def __to_reauthorize_spotify_response(
-        self, access_token: str, expires_in: int
-    ) -> ReauthorizeSpotifyResponse:
-        return ReauthorizeSpotifyResponse(
-            access_token=access_token, expires_in=expires_in
         )
 
     def __to_search_spotify_response(

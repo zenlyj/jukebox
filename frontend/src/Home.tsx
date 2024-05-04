@@ -18,6 +18,7 @@ import {
 } from "./api/GetPlaylistSize.tsx";
 import {
   getAccessToken,
+  getRefreshToken,
   getTokenExpireTime,
   getTokenExpiresIn,
   setAccessToken,
@@ -60,10 +61,11 @@ function Home() {
       return;
     }
     const accessToken = getAccessToken();
-    if (!accessToken) {
+    const refreshToken = getRefreshToken();
+    if (!accessToken || !refreshToken) {
       return;
     }
-    refreshAccessToken(accessToken).then(
+    refreshAccessToken(accessToken, refreshToken).then(
       (response: RefreshAccessTokenResponse) => {
         if (!response.accessToken) {
           console.log("Unable to refresh access token");

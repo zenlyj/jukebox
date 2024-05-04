@@ -24,7 +24,16 @@ export interface AuthorizeResponse {
 }
 
 export function authorize(authCode: string): Promise<AuthorizeResponse> {
-  return fetch(`${SERVER_URL}/spotify/authorize?authorization_code=${authCode}`)
+  return fetch(`${SERVER_URL}/spotify/authorization/`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      grant_type: "authorization_code",
+      authorization_code: authCode,
+    }),
+  })
     .then((response: Response) => (response.ok ? response.json() : null))
     .then((response: ServerResponse | null) => mapServerResponse(response));
 }
