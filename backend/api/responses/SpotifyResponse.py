@@ -10,7 +10,7 @@ class SpotifyAuthorizationResponse(BaseModel):
 
 class SearchSpotifyResponse(BaseModel):
     name: str
-    artist_names: List[str]
+    artists_spotify_id: List[str]
     uri: str
     album_cover: str
     duration: int
@@ -20,3 +20,9 @@ class SearchSpotifyResponse(BaseModel):
 class SpotifyUserProfileResponse(BaseModel):
     name: str
     user_id: str
+
+
+class SpotifyArtistResponse(BaseModel):
+    name: str
+    genres: List[str]
+    spotify_id: str

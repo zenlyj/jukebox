@@ -2,7 +2,13 @@ from typing import List
 from typing import Tuple
 from enum import Enum
 
-SpotifyData = Tuple[str, List[str], str, str, int, str]
+SpotifyArtistData = Tuple[str, List[str], str]
+
+SpotifySearchTrackArtistData = Tuple[str, str]
+
+SpotifySearchTrackData = Tuple[
+    str, List[SpotifySearchTrackArtistData], str, str, int, str
+]
 
 RedditData = Tuple[str, str]
 

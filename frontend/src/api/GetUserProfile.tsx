@@ -30,7 +30,7 @@ export async function getUserProfile(
 ): Promise<GetUserProfileResponse> {
   return fetch(`${SERVER_URL}/spotify/user-profile/`, {
     headers: {
-      Authorization: accessToken,
+      Authorization: `Bearer ${accessToken}`,
     },
   })
     .then((response: Response) => (response.ok ? response.json() : null))

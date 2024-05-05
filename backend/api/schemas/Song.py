@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 from typing import List
+from api.schemas.Artist import ArtistCreate
 
 
 class SongBase(BaseModel):
     name: str
-    artist_names: List[str]
     uri: str
     album_cover: str
     duration: int
@@ -14,7 +14,7 @@ class SongBase(BaseModel):
 
 
 class SongCreate(SongBase):
-    pass
+    artists: List[ArtistCreate]
 
 
 class SongOut(BaseModel):
