@@ -7,6 +7,7 @@ from api.responses.SongResponse import CreateSongResponse
 from api.schemas import Song as song_schemas
 from api.models.Song import Song
 from api.models.Artist import Artist
+from api.models.ArtistGenre import ArtistGenre
 
 
 class SongService:
@@ -57,11 +58,20 @@ class SongService:
         )
         song_repo.create_song(db, new_song)
 
-        new_song_artists = [
-            Artist(name=artist_name, song_id=new_song.id)
-            for artist_name in song.artist_names
-        ]
-        song_repo.create_song_artists(db, new_song_artists)
+        new_song_artists = []
+        for artist in song.artists:
+            new_song_artist = Artist(
+                name=artist.name, song_id=new_song.id, spotify_id=artist.spotify_id
+            )
+            song_repo.create_song_artists(db, [new_song_artist])
+            song_repo.create_song_artist_genres(
+                db,
+                [
+                    ArtistGenre(artist_id=new_song_artist.id, name=genre)
+                    for genre in artist.genres
+                ],
+            )
+            new_song_artists.append(new_song_artist)
         song_output = song_schemas.SongOut(
             id=new_song.id,
             name=new_song.name,

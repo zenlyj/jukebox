@@ -3,7 +3,7 @@ from api.database import Base
 
 
 class Song(Base):
-    __tablename__ = "songs"
+    __tablename__ = "song"
 
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)

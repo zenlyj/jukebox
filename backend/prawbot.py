@@ -7,6 +7,8 @@ from dotenv import load_dotenv
 from typing import List
 from api.tools.DataTypes import Genre
 from api.tools.DataTypes import SubName
+from api.schemas.Artist import ArtistCreate
+from api.schemas.Song import SongCreate
 
 reddit_parser = RedditParser()
 
@@ -43,14 +45,49 @@ class PrawBot:
             return
         song["genre_name"] = genre.name
         song["timestamp"] = timestamp
-        print(song)
-        res = requests.post(f"{SERVER_URL}/songs/", data=json.dumps(song))
+        artists = self.__get_artists(song["artists_spotify_id"])
+        song_artists_payload = [
+            ArtistCreate(
+                name=artist["name"],
+                genres=artist["genres"],
+                spotify_id=artist["spotify_id"],
+            )
+            for artist in artists
+        ]
+        song_payload = SongCreate(
+            name=song["name"],
+            uri=song["uri"],
+            album_cover=song["album_cover"],
+            duration=song["duration"],
+            spotify_id=song["spotify_id"],
+            genre_name=song["genre_name"],
+            timestamp=song["timestamp"],
+            artists=song_artists_payload,
+        )
+        res = requests.post(
+            f"{SERVER_URL}/songs/", data=song_payload.model_dump_json().encode("utf-8")
+        )
         print(res.text)
+
+    def __get_artists(self, spotify_ids: List[str]) -> dict:
+        access_token = self.__get_access_token()
+        params = {"ids": ",".join(spotify_ids)}
+        headers = {"Authorization": f"Bearer {access_token}"}
+        res = requests.get(
+            f"{SERVER_URL}/spotify/artists/", params=params, headers=headers
+        )
+        if res.status_code != 200:
+            print(res.text)
+            raise Exception("Unable to get artists")
+        return json.loads(res.text)
 
     def __search_song(self, query: str) -> dict:
         access_token = self.__get_access_token()
-        params = {"query": query, "query_type": "track", "access_token": access_token}
-        res = requests.get(f"{SERVER_URL}/spotify/track", params=params)
+        params = {"query": query, "query_type": "track"}
+        headers = {"Authorization": f"Bearer {access_token}"}
+        res = requests.get(
+            f"{SERVER_URL}/spotify/track", params=params, headers=headers
+        )
 
         if res.status_code == 200:
             return json.loads(res.text)

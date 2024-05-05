@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from api.models.Song import Song
 from api.models.Artist import Artist
+from api.models.ArtistGenre import ArtistGenre
 from api.tools.DataTypes import Genre
 
 from typing import List
@@ -36,6 +37,14 @@ class SongRepository:
         db.commit()
         for artist in artists:
             db.refresh(artist)
+
+    def create_song_artist_genres(
+        self, db: Session, artist_genres: List[ArtistGenre]
+    ) -> None:
+        db.add_all(artist_genres)
+        db.commit()
+        for genre in artist_genres:
+            db.refresh(genre)
 
     def is_song_exist(self, db: Session, spotify_id: str) -> bool:
         return db.query(Song).filter(Song.spotify_id == spotify_id).count() > 0

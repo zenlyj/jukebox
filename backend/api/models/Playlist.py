@@ -8,4 +8,4 @@ class Playlist(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     spotify_user_id = Column(String)
-    song_id = Column(Integer, ForeignKey("songs.id"))
+    song_id = Column(Integer, ForeignKey("song.id"))

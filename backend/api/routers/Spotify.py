@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Header
-from typing import Union
+from typing import Union, List
 from typing_extensions import Annotated
 
 from api.services.SpotifyService import SpotifyService
@@ -8,6 +8,7 @@ from api.tools.SpotifyParser import SpotifyParser
 from api.responses.SpotifyResponse import SpotifyAuthorizationResponse
 from api.responses.SpotifyResponse import SearchSpotifyResponse
 from api.responses.SpotifyResponse import SpotifyUserProfileResponse
+from api.responses.SpotifyResponse import SpotifyArtistResponse
 
 from api.schemas.Authorization import AuthorizationCreate
 from api.schemas.Authorization import AuthorizationRefresh
@@ -32,10 +33,11 @@ def authorize_spotify(
 def search_spotify(
     query: str,
     query_type: str,
-    access_token: str,
+    Authorization: Annotated[Union[str, None], Header()],
     spotify_service: SpotifyService = Depends(SpotifyService),
     spotify_parser: SpotifyParser = Depends(SpotifyParser),
 ):
+    _, access_token = Authorization.split()
     return spotify_service.search(query, query_type, access_token, spotify_parser)
 
 
@@ -44,4 +46,16 @@ def get_user_profile(
     Authorization: Annotated[Union[str, None], Header()],
     spotify_service: SpotifyService = Depends(SpotifyService),
 ):
-    return spotify_service.get_user_profile_info(Authorization)
+    _, access_token = Authorization.split()
+    return spotify_service.get_user_profile_info(access_token)
+
+
+@router.get("/spotify/artists/", response_model=List[SpotifyArtistResponse])
+def get_artists(
+    ids: str,
+    Authorization: Annotated[Union[str, None], Header()],
+    spotify_service: SpotifyService = Depends(SpotifyService),
+    spotify_parser: SpotifyParser = Depends(SpotifyParser),
+):
+    _, access_token = Authorization.split()
+    return spotify_service.get_artists(ids, access_token, spotify_parser)
