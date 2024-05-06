@@ -82,14 +82,14 @@ class SongService:
             genre_name=song.genre_name,
             timestamp=song.timestamp,
         )
-        return self.__to_create_song_response(song_output)
+        return self._to_create_song_response(song_output)
 
     def to_get_song_response(
         self, song_outputs: List[song_schemas.SongOut], song_count: int
     ) -> GetSongResponse:
         return GetSongResponse(songs=song_outputs, song_count=song_count)
 
-    def __to_create_song_response(
+    def _to_create_song_response(
         self, song_output: song_schemas.Song
     ) -> CreateSongResponse:
         return CreateSongResponse(song=song_output)

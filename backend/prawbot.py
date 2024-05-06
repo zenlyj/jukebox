@@ -30,22 +30,20 @@ class PrawBot:
     def update(self) -> None:
         for genre in [Genre.HIPHOP, Genre.ELECTRONIC, Genre.INDIE]:
             sub_name = SubName[genre]
-            for title, timestamp in reddit_parser.parse(
-                sub_name, self.__pull(sub_name)
-            ):
-                self.__push(title, genre, timestamp)
+            for title, timestamp in reddit_parser.parse(sub_name, self._pull(sub_name)):
+                self._push(title, genre, timestamp)
 
-    def __pull(self, subreddit: str) -> List[object]:
+    def _pull(self, subreddit: str) -> List[object]:
         return self.reddit.subreddit(subreddit).hot(limit=500)
 
-    def __push(self, title: str, genre: Genre, timestamp) -> None:
+    def _push(self, title: str, genre: Genre, timestamp) -> None:
         print(title)
-        song = self.__search_song(title)
+        song = self._search_song(title)
         if not song:
             return
         song["genre_name"] = genre.name
         song["timestamp"] = timestamp
-        artists = self.__get_artists(song["artists_spotify_id"])
+        artists = self._get_artists(song["artists_spotify_id"])
         song_artists_payload = [
             ArtistCreate(
                 name=artist["name"],
@@ -69,8 +67,8 @@ class PrawBot:
         )
         print(res.text)
 
-    def __get_artists(self, spotify_ids: List[str]) -> dict:
-        access_token = self.__get_access_token()
+    def _get_artists(self, spotify_ids: List[str]) -> dict:
+        access_token = self._get_access_token()
         params = {"ids": ",".join(spotify_ids)}
         headers = {"Authorization": f"Bearer {access_token}"}
         res = requests.get(
@@ -81,8 +79,8 @@ class PrawBot:
             raise Exception("Unable to get artists")
         return json.loads(res.text)
 
-    def __search_song(self, query: str) -> dict:
-        access_token = self.__get_access_token()
+    def _search_song(self, query: str) -> dict:
+        access_token = self._get_access_token()
         params = {"query": query, "query_type": "track"}
         headers = {"Authorization": f"Bearer {access_token}"}
         res = requests.get(
@@ -97,15 +95,15 @@ class PrawBot:
             if errorMessage == "The access token expired":
                 f = open("spotify_token.json", "r")
                 refresh_token = json.load(f)["refresh_token"]
-                self.__refresh_access_token(access_token, refresh_token)
-                self.__search_song(query)
+                self._refresh_access_token(access_token, refresh_token)
+                self._search_song(query)
             return None
 
-    def __get_access_token(self) -> str:
+    def _get_access_token(self) -> str:
         f = open("spotify_token.json", "r")
         return json.load(f)["access_token"]
 
-    def __refresh_access_token(self, expired_token: str, refresh_token: str) -> None:
+    def _refresh_access_token(self, expired_token: str, refresh_token: str) -> None:
         auth_data = {
             "grant_type": "refresh_token",
             "authorization_code": None,
