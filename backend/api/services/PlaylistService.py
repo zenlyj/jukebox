@@ -56,7 +56,7 @@ class PlaylistService:
         self, db: Session, playlist_repo: PlaylistRepository, spotify_user_id: str
     ) -> GetPlaylistSizeResponse:
         size = playlist_repo.get_playlist_size(db, spotify_user_id)
-        return self.__to_get_playlist_size_response(size)
+        return self._to_get_playlist_size_response(size)
 
     def add_song_to_playlist(
         self, db: Session, playlist_repo: PlaylistRepository, playlist: PlaylistCreate
@@ -74,7 +74,7 @@ class PlaylistService:
             spotify_user_id=new_playlist_song.spotify_user_id,
             song_id=new_playlist_song.song_id,
         )
-        return self.__to_add_song_to_playlist_response(playlist_response_input)
+        return self._to_add_song_to_playlist_response(playlist_response_input)
 
     def remove_song_from_playlist(
         self,
@@ -88,9 +88,9 @@ class PlaylistService:
         )
         if num_deleted == 0:
             raise HTTPException(status_code=422, detail="Failed to delete song")
-        return self.__to_delete_song_from_playlist_response(song_id)
+        return self._to_delete_song_from_playlist_response(song_id)
 
-    def __to_add_song_to_playlist_response(
+    def _to_add_song_to_playlist_response(
         self,
         playlist_song: playlist_schemas.Playlist,
     ) -> AddSongToPlaylistResponse:
@@ -100,7 +100,7 @@ class PlaylistService:
             song_id=playlist_song.song_id,
         )
 
-    def __to_delete_song_from_playlist_response(
+    def _to_delete_song_from_playlist_response(
         self,
         song_id: int,
     ) -> DeleteSongFromPlaylistResponse:
@@ -109,7 +109,7 @@ class PlaylistService:
         )
         return DeleteSongFromPlaylistResponse(message=message)
 
-    def __to_get_playlist_size_response(
+    def _to_get_playlist_size_response(
         self, playlist_size: int
     ) -> GetPlaylistSizeResponse:
         message = "{playlist_size} songs in playlist"

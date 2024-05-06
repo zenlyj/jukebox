@@ -31,15 +31,15 @@ class RedditParser:
         normalized_titles = []
         if subreddit == SubName[Genre.HIPHOP]:
             normalized_titles = [
-                title for title in self.__parse_hiphopheads_titles(titles) if title
+                title for title in self._parse_hiphopheads_titles(titles) if title
             ]
         if subreddit == SubName[Genre.ELECTRONIC]:
             normalized_titles = [
-                title for title in self.__parse_electronicmusic_titles(titles) if title
+                title for title in self._parse_electronicmusic_titles(titles) if title
             ]
         if subreddit == SubName[Genre.INDIE]:
             normalized_titles = [
-                title for title in self.__parse_indieheads_titles(titles) if title
+                title for title in self._parse_indieheads_titles(titles) if title
             ]
         created_timestamps = [
             str(int(submission.created_utc)) for submission in relevant_submissions
@@ -48,42 +48,42 @@ class RedditParser:
             (data[0], data[1]) for data in zip(normalized_titles, created_timestamps)
         ]
 
-    def __parse_hiphopheads_titles(self, titles: List[str]) -> List[str]:
-        return [self.__normalize(title) for title in titles]
+    def _parse_hiphopheads_titles(self, titles: List[str]) -> List[str]:
+        return [self._normalize(title) for title in titles]
 
-    def __parse_electronicmusic_titles(self, titles: List[str]) -> List[str]:
-        return [self.__normalize(title) for title in titles]
+    def _parse_electronicmusic_titles(self, titles: List[str]) -> List[str]:
+        return [self._normalize(title) for title in titles]
 
-    def __parse_indieheads_titles(self, titles: List[str]) -> List[str]:
-        return [self.__normalize(title) for title in titles]
+    def _parse_indieheads_titles(self, titles: List[str]) -> List[str]:
+        return [self._normalize(title) for title in titles]
 
-    def __normalize(self, title: str) -> Union[str, None]:
-        split = self.__remove_tag(title).split("-")
+    def _normalize(self, title: str) -> Union[str, None]:
+        split = self._remove_tag(title).split("-")
         if len(split) < 2:
             return None
         name, artist = split[1], split[0]
-        normalized_name, normalized_artist = self.__normalize_name(
+        normalized_name, normalized_artist = self._normalize_name(
             name
-        ), self.__normalize_artist(artist)
-        normalized_title = self.__remove_misc(f"{normalized_name} {normalized_artist}")
+        ), self._normalize_artist(artist)
+        normalized_title = self._remove_misc(f"{normalized_name} {normalized_artist}")
         return normalized_title
 
-    def __remove_tag(self, title: str) -> str:
+    def _remove_tag(self, title: str) -> str:
         return re.sub(self.tag_regex, "", title.lower()).strip()
 
-    def __normalize_name(self, name: str) -> str:
+    def _normalize_name(self, name: str) -> str:
         new_name = name.lower().strip()
         for stop_word in self.name_stop_words:
             new_name = re.sub(stop_word, "", new_name)
         return new_name.strip()
 
-    def __normalize_artist(self, artist: str) -> str:
+    def _normalize_artist(self, artist: str) -> str:
         new_artist = artist.lower().strip()
         for stop_word in self.artist_stop_words:
             new_artist = re.sub(stop_word, "", new_artist)
         return new_artist.strip()
 
-    def __remove_misc(self, title: str) -> str:
+    def _remove_misc(self, title: str) -> str:
         new_title = title
         for stop_word in self.misc_stop_words:
             new_title = re.sub(stop_word, "", new_title)
