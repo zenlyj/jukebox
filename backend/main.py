@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from api.routers import Spotify
 from api.routers import Songs
 from api.routers import Playlist
+from api.routers import Preferences
 
 Base.metadata.create_all(bind=engine)
 
@@ -20,3 +21,4 @@ app.add_middleware(
 app.include_router(Spotify.router)
 app.include_router(Songs.router)
 app.include_router(Playlist.router)
+app.include_router(Preferences.router)

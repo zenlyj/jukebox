@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 from api.repositories.SongRepository import SongRepository
-from api.responses.SongResponse import GetSongResponse
+from api.responses.SongResponse import GetSongsResponse
 from api.responses.SongResponse import CreateSongResponse
 from api.schemas import Song as song_schemas
 from api.models.Song import Song
@@ -18,7 +18,7 @@ class SongService:
         genre_name: str,
         page_num: int,
         page_size: int,
-    ) -> GetSongResponse:
+    ) -> GetSongsResponse:
         offset, limit = (page_num - 1) * page_size, page_size
         songs = song_repo.get_songs(db, genre_name, offset, limit)
         song_artists = song_repo.get_song_artists(db, set(song.id for song in songs))
@@ -40,7 +40,7 @@ class SongService:
                 )
             )
         song_count = song_repo.get_song_count(db, genre_name)
-        return self.to_get_song_response(song_outputs, song_count)
+        return self.to_get_songs_response(song_outputs, song_count)
 
     def add_song(
         self, db: Session, song_repo: SongRepository, song: song_schemas.SongCreate
@@ -79,15 +79,28 @@ class SongService:
             uri=new_song.uri,
             album_cover=new_song.album_cover,
             duration=new_song.duration,
-            genre_name=song.genre_name,
-            timestamp=song.timestamp,
+            genre_name=new_song.genre_name,
+            timestamp=new_song.timestamp,
         )
         return self._to_create_song_response(song_output)
 
-    def to_get_song_response(
+    def get_song(self, db: Session, song_repo: SongRepository, song_id: int) -> Song:
+        song = song_repo.get_song(db, song_id)
+        return song_schemas.SongOut(
+            id=song.id,
+            name=song.name,
+            artist_names=[artist.name for artist in song.artists],
+            uri=song.uri,
+            album_cover=song.album_cover,
+            duration=song.duration,
+            genre_name=song.genre_name,
+            timestamp=song.timestamp,
+        )
+
+    def to_get_songs_response(
         self, song_outputs: List[song_schemas.SongOut], song_count: int
-    ) -> GetSongResponse:
-        return GetSongResponse(songs=song_outputs, song_count=song_count)
+    ) -> GetSongsResponse:
+        return GetSongsResponse(songs=song_outputs, song_count=song_count)
 
     def _to_create_song_response(
         self, song_output: song_schemas.Song

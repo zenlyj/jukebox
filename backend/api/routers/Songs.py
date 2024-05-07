@@ -4,14 +4,14 @@ from api.database import get_db
 from api.schemas.Song import SongCreate
 from api.repositories.SongRepository import SongRepository
 from api.services.SongService import SongService
-from api.responses.SongResponse import GetSongResponse
+from api.responses.SongResponse import GetSongsResponse
 from api.responses.SongResponse import CreateSongResponse
 
 
 router = APIRouter()
 
 
-@router.get("/songs/", response_model=GetSongResponse)
+@router.get("/songs/", response_model=GetSongsResponse)
 def get_songs(
     genre_name: str,
     page_num: int,

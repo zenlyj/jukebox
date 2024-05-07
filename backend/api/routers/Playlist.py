@@ -5,7 +5,7 @@ from api.schemas.Playlist import PlaylistCreate
 from api.repositories.PlaylistRepository import PlaylistRepository
 from api.services.PlaylistService import PlaylistService
 from api.services.SongService import SongService
-from api.responses.SongResponse import GetSongResponse
+from api.responses.SongResponse import GetSongsResponse
 from api.responses.PlaylistResponse import AddSongToPlaylistResponse
 from api.responses.PlaylistResponse import DeleteSongFromPlaylistResponse
 from api.responses.PlaylistResponse import GetPlaylistSizeResponse
@@ -13,7 +13,7 @@ from api.responses.PlaylistResponse import GetPlaylistSizeResponse
 router = APIRouter()
 
 
-@router.get("/playlist/", response_model=GetSongResponse)
+@router.get("/playlist/", response_model=GetSongsResponse)
 def get_playlist_songs(
     spotify_user_id: str,
     page_num: int,

@@ -7,7 +7,7 @@ from api.schemas.Playlist import PlaylistCreate
 from api.schemas import Song as song_schemas
 from api.schemas import Playlist as playlist_schemas
 from api.repositories.PlaylistRepository import PlaylistRepository
-from api.responses.SongResponse import GetSongResponse
+from api.responses.SongResponse import GetSongsResponse
 from api.responses.PlaylistResponse import AddSongToPlaylistResponse
 from api.responses.PlaylistResponse import DeleteSongFromPlaylistResponse
 from api.responses.PlaylistResponse import GetPlaylistSizeResponse
@@ -22,7 +22,7 @@ class PlaylistService:
         spotify_user_id: str,
         page_num: int,
         page_size: int,
-    ) -> GetSongResponse:
+    ) -> GetSongsResponse:
         offset, limit = (page_num - 1) * page_size, page_size
         playlist_songs = playlist_repo.get_playlist_songs(
             db, spotify_user_id, offset, limit
@@ -50,7 +50,7 @@ class PlaylistService:
                 )
             )
         playlist_size = playlist_repo.get_playlist_size(db, spotify_user_id)
-        return song_service.to_get_song_response(playlist_song_outputs, playlist_size)
+        return song_service.to_get_songs_response(playlist_song_outputs, playlist_size)
 
     def get_playlist_size(
         self, db: Session, playlist_repo: PlaylistRepository, spotify_user_id: str
