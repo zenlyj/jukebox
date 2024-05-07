@@ -25,7 +25,8 @@ class SongRepository:
         )
 
     def get_song_artists(self, db: Session, song_ids: Set[int]) -> List[Artist]:
-        return db.query(Artist).filter(Artist.song_id.in_(song_ids)).all()
+        songs = db.query(Song).filter(Song.id.in_(song_ids)).all()
+        return [artist for song in songs for artist in song.artists]
 
     def create_song(self, db: Session, song: Song) -> None:
         db.add(song)

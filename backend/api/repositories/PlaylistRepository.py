@@ -13,24 +13,24 @@ class PlaylistRepository:
     def get_playlist_songs(
         self, db: Session, spotify_user_id: str, offset: int, limit: int
     ) -> List[Song]:
-        return (
-            db.query(Song)
-            .join(
-                Playlist,
-                and_(
-                    Song.id == Playlist.song_id,
-                    Playlist.spotify_user_id == spotify_user_id,
-                ),
-            )
+        playlist_items = (
+            db.query(Playlist)
+            .filter(Playlist.spotify_user_id == spotify_user_id)
             .offset(offset)
             .limit(limit)
             .all()
         )
+        return [playlist_item.song for playlist_item in playlist_items]
 
     def get_playlist_song_artists(
         self, db: Session, song_ids: Set[int]
     ) -> List[Artist]:
-        return db.query(Artist).filter(Artist.song_id.in_(song_ids)).all()
+        playlist_items = db.query(Playlist).filter(Playlist.song_id.in_(song_ids)).all()
+        return [
+            artist
+            for playlist_item in playlist_items
+            for artist in playlist_item.song.artists
+        ]
 
     def add_song_to_playlist(self, db: Session, playlist_song: Playlist) -> None:
         db.add(playlist_song)
