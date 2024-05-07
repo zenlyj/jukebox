@@ -24,6 +24,9 @@ class SongRepository:
             .all()
         )
 
+    def get_song(self, db: Session, song_id: int) -> Song:
+        return db.query(Song).filter(Song.id == song_id).one()
+
     def get_song_artists(self, db: Session, song_ids: Set[int]) -> List[Artist]:
         songs = db.query(Song).filter(Song.id.in_(song_ids)).all()
         return [artist for song in songs for artist in song.artists]

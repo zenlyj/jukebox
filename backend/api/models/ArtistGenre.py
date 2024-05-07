@@ -12,4 +12,6 @@ class ArtistGenre(Base):
     name = Column(String)
 
     artist = relationship("Artist", uselist=False, back_populates="artist_genres")
-    preference = relationship("Preference", uselist=False, back_populates="preference")
+    preference = relationship(
+        "Preference", uselist=False, back_populates="artist_genres"
+    )
