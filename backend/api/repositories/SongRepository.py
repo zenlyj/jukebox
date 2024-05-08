@@ -6,7 +6,6 @@ from api.models.ArtistGenre import ArtistGenre
 from api.tools.DataTypes import Genre
 
 from typing import List
-from typing import Set
 
 
 class SongRepository:
@@ -26,10 +25,6 @@ class SongRepository:
 
     def get_song(self, db: Session, song_id: int) -> Song:
         return db.query(Song).filter(Song.id == song_id).one()
-
-    def get_song_artists(self, db: Session, song_ids: Set[int]) -> List[Artist]:
-        songs = db.query(Song).filter(Song.id.in_(song_ids)).all()
-        return [artist for song in songs for artist in song.artists]
 
     def create_song(self, db: Session, song: Song) -> None:
         db.add(song)
