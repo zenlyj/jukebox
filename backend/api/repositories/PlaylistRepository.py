@@ -22,16 +22,6 @@ class PlaylistRepository:
         )
         return [playlist_item.song for playlist_item in playlist_items]
 
-    def get_playlist_song_artists(
-        self, db: Session, song_ids: Set[int]
-    ) -> List[Artist]:
-        playlist_items = db.query(Playlist).filter(Playlist.song_id.in_(song_ids)).all()
-        return [
-            artist
-            for playlist_item in playlist_items
-            for artist in playlist_item.song.artists
-        ]
-
     def add_song_to_playlist(self, db: Session, playlist_song: Playlist) -> None:
         db.add(playlist_song)
         db.commit()

@@ -27,28 +27,19 @@ class PlaylistService:
         playlist_songs = playlist_repo.get_playlist_songs(
             db, spotify_user_id, offset, limit
         )
-        playlist_song_artists = playlist_repo.get_playlist_song_artists(
-            db, set(song.id for song in playlist_songs)
-        )
-        playlist_song_outputs = []
-        for song in playlist_songs:
-            artist_names = [
-                artist.name
-                for artist in playlist_song_artists
-                if artist.song_id == song.id
-            ]
-            playlist_song_outputs.append(
-                song_schemas.SongOut(
-                    id=song.id,
-                    name=song.name,
-                    artist_names=artist_names,
-                    uri=song.uri,
-                    album_cover=song.album_cover,
-                    duration=song.duration,
-                    genre_name=song.genre_name,
-                    timestamp=song.timestamp,
-                )
+        playlist_song_outputs = [
+            song_schemas.SongOut(
+                id=song.id,
+                name=song.name,
+                artist_names=[artist.name for artist in song.artists],
+                uri=song.uri,
+                album_cover=song.album_cover,
+                duration=song.duration,
+                genre_name=song.genre_name,
+                timestamp=song.timestamp,
             )
+            for song in playlist_songs
+        ]
         playlist_size = playlist_repo.get_playlist_size(db, spotify_user_id)
         return song_service.to_get_songs_response(playlist_song_outputs, playlist_size)
 

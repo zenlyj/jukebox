@@ -21,24 +21,19 @@ class SongService:
     ) -> GetSongsResponse:
         offset, limit = (page_num - 1) * page_size, page_size
         songs = song_repo.get_songs(db, genre_name, offset, limit)
-        song_artists = song_repo.get_song_artists(db, set(song.id for song in songs))
-        song_outputs = []
-        for song in songs:
-            artist_names = [
-                artist.name for artist in song_artists if artist.song_id == song.id
-            ]
-            song_outputs.append(
-                song_schemas.SongOut(
-                    id=song.id,
-                    name=song.name,
-                    artist_names=artist_names,
-                    uri=song.uri,
-                    album_cover=song.album_cover,
-                    duration=song.duration,
-                    genre_name=song.genre_name,
-                    timestamp=song.timestamp,
-                )
+        song_outputs = [
+            song_schemas.SongOut(
+                id=song.id,
+                name=song.name,
+                artist_names=[artist.name for artist in song.artists],
+                uri=song.uri,
+                album_cover=song.album_cover,
+                duration=song.duration,
+                genre_name=song.genre_name,
+                timestamp=song.timestamp,
             )
+            for song in songs
+        ]
         song_count = song_repo.get_song_count(db, genre_name)
         return self.to_get_songs_response(song_outputs, song_count)
 
