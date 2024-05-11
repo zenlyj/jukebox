@@ -27,21 +27,8 @@ class PlaylistService:
         playlist_songs = playlist_repo.get_playlist_songs(
             db, spotify_user_id, offset, limit
         )
-        playlist_song_outputs = [
-            song_schemas.SongOut(
-                id=song.id,
-                name=song.name,
-                artist_names=[artist.name for artist in song.artists],
-                uri=song.uri,
-                album_cover=song.album_cover,
-                duration=song.duration,
-                genre_name=song.genre_name,
-                timestamp=song.timestamp,
-            )
-            for song in playlist_songs
-        ]
         playlist_size = playlist_repo.get_playlist_size(db, spotify_user_id)
-        return song_service.to_get_songs_response(playlist_song_outputs, playlist_size)
+        return song_service.to_get_songs_response(playlist_songs, playlist_size)
 
     def get_playlist_size(
         self, db: Session, playlist_repo: PlaylistRepository, spotify_user_id: str
