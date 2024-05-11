@@ -1,5 +1,5 @@
 import numpy as np
-from typing import List
+from typing import Set
 
 
 def similarity(query: str, result: str) -> float:
@@ -9,13 +9,13 @@ def similarity(query: str, result: str) -> float:
     return len(matching_keywords) / len(query_keywords)
 
 
-def score(
-    all_genres: List[int], user_preferred_genres: List[int], song_genres: List[int]
+def preference_score(
+    all_genres: Set[int], user_preferred_genres: Set[int], song_genres: Set[int]
 ) -> int:
-    n = len(all_genres)
-    preferred_set, song_set = set(user_preferred_genres), set(song_genres)
+    genres = list(all_genres)
+    n = len(genres)
     preference_vector = np.array(
-        [1 if all_genres[i] in preferred_set else 0 for i in range(n)]
+        [1 if genres[i] in user_preferred_genres else 0 for i in range(n)]
     )
-    song_vector = np.array([1 if all_genres[i] in song_set else 0 for i in range(n)])
+    song_vector = np.array([1 if genres[i] in song_genres else 0 for i in range(n)])
     return np.dot(preference_vector, song_vector)

@@ -9,7 +9,16 @@ from typing import List
 
 
 class SongRepository:
-    def get_songs(
+    def get_all_songs(self, db: Session, genre_name: str) -> List[Song]:
+        return (
+            db.query(Song)
+            .filter(
+                or_(genre_name == Genre.GENERAL.name, Song.genre_name == genre_name)
+            )
+            .all()
+        )
+
+    def get_songs_ordered_by_date(
         self, db: Session, genre_name: str, offset: int, limit: int
     ) -> List[Song]:
         return (
