@@ -2,7 +2,7 @@ import { Genre } from "../components/models/Genre.tsx";
 import { Song } from "../components/models/Song.tsx";
 import { SERVER_URL } from "./constants.tsx";
 
-export interface GetSongsResponse {
+export interface GetSongsByDateResponse {
   songs: Song[];
   songCount: number;
 }
@@ -23,7 +23,7 @@ export interface ServerResponse {
 
 const mapServerResponse = (
   response: ServerResponse | null
-): GetSongsResponse => {
+): GetSongsByDateResponse => {
   if (!response) {
     return {
       songs: [],
@@ -46,11 +46,11 @@ const mapServerResponse = (
   };
 };
 
-export async function getSongs(
+export async function getSongsByDate(
   genre: Genre,
   pageNumber: number,
   pageSize: number
-): Promise<GetSongsResponse> {
+): Promise<GetSongsByDateResponse> {
   const url =
     `${SERVER_URL}/songs/?` +
     new URLSearchParams({
