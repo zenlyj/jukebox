@@ -1,5 +1,6 @@
 import React, { useEffect, useReducer } from "react";
 import { Box } from "@mui/material";
+import ThumbUpOffAltIcon from "@mui/icons-material/ThumbUpOffAlt";
 import MusicList from "./MusicList.tsx";
 import { Song } from "./models/Song.tsx";
 import {
@@ -25,6 +26,10 @@ import {
   setTokenExpireTime,
   setTokenExpiresIn,
 } from "../utils/session.tsx";
+import {
+  AddUserPreferenceResponse,
+  addUserPreference,
+} from "../api/AddUserPreference.tsx";
 
 interface State {
   songs: Song[];
@@ -127,6 +132,18 @@ function Playlist() {
     );
   };
 
+  const addUserPreferenceCallback = (songId: number): void => {
+    const spotifyUserId = getUserInfo()?.userId;
+    if (!spotifyUserId) {
+      return;
+    }
+    addUserPreference(spotifyUserId, songId).then(
+      (response: AddUserPreferenceResponse) => {
+        console.log(response.message);
+      }
+    );
+  };
+
   const handlePageChange = (event, pageNumber: number): void => {
     dispatch({ type: ActionType.CHANGE_PAGE_NUMBER, pageNum: pageNumber });
   };
@@ -170,7 +187,12 @@ function Playlist() {
             justifyContent: "space-between",
           }}
         >
-          <MusicList songs={state.songs} onClickHandler={removePlaylistSong} />
+          <MusicList
+            songs={state.songs}
+            onClickHandler={removePlaylistSong}
+            secondaryActionHandler={addUserPreferenceCallback}
+            secondaryActionIcon={<ThumbUpOffAltIcon />}
+          />
           <MusicListPagination
             pageCount={getPageCount()}
             pageNum={state.pageNum}

@@ -7,14 +7,17 @@ import { Divider } from "@mui/material";
 import { Song } from "./models/Song";
 import Box from "@mui/material/Box";
 import { ListItemAvatar } from "@mui/material";
+import IconButton from "@mui/material/IconButton";
 import LinearProgress from "@mui/material/LinearProgress";
 import { getMonthName, padNum } from "../utils/datetime.tsx";
-import { jbdarkgrey, jbgrey, jblightgrey } from "../utils/colors.tsx";
+import { jbdarkgrey, jbgrey, jblightgrey, jbwhite } from "../utils/colors.tsx";
 
 interface Props {
   songs: Song[];
   displayDate?: boolean;
-  onClickHandler: (songId: number, songUri: string) => void;
+  onClickHandler: (songId: number) => void;
+  secondaryActionHandler?: (songId: number) => void;
+  secondaryActionIcon?: React.JSX.Element;
 }
 
 function MusicList(props: Props) {
@@ -41,14 +44,36 @@ function MusicList(props: Props) {
     )}:${padNum(min)}`;
   };
 
+  const onSecondaryAction = (songId: number): void => {
+    const callback = props.secondaryActionHandler;
+    if (!callback) {
+      return;
+    }
+    callback(songId);
+  };
+
   const secondaryTypographyProps = {
     color: jblightgrey,
   };
 
   const listItem = (song: Song): React.JSX.Element => (
-    <ListItem disablePadding key={song.id}>
+    <ListItem
+      disablePadding
+      key={song.id}
+      secondaryAction={
+        props.secondaryActionHandler ? (
+          <IconButton
+            edge="end"
+            sx={{ color: jbwhite }}
+            onClick={() => onSecondaryAction(song.id)}
+          >
+            {props.secondaryActionIcon}
+          </IconButton>
+        ) : null
+      }
+    >
       <ListItemButton
-        onClick={() => props.onClickHandler(song.id, song.uri)}
+        onClick={() => props.onClickHandler(song.id)}
         sx={{
           "&:hover": {
             opacity: 0.5,
@@ -63,7 +88,13 @@ function MusicList(props: Props) {
           secondary={formatArtistNames(song.artistNames)}
           secondaryTypographyProps={secondaryTypographyProps}
         />
-        <Box sx={{ display: "flex", columnGap: "2rem" }}>
+        <Box
+          sx={{
+            display: "flex",
+            columnGap: "2rem",
+            paddingRight: props.secondaryActionHandler ? "2rem" : "0rem",
+          }}
+        >
           {props.displayDate ? (
             <ListItemText
               secondary={formatTimestamp(song.timestamp)}
