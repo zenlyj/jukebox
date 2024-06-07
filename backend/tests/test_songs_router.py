@@ -2,35 +2,11 @@ from fastapi.testclient import TestClient
 from fastapi import HTTPException
 import pytest
 from ..main import app
-from api.schemas.Song import SongOut
-from api.schemas.Song import SongCreate
-from api.schemas.Artist import ArtistCreate
+from .mocks import song_out
+from .mocks import song_create
+
 
 client = TestClient(app)
-
-song_out = SongOut(
-    id=1,
-    name="runaway",
-    artist_names=["kanye west"],
-    uri="",
-    album_cover="",
-    duration=123456,
-    genre_name="HIP_HOP",
-    timestamp="123456",
-)
-
-song_create = SongCreate(
-    name="swimming pools (drank)",
-    uri="",
-    album_cover="",
-    duration=123456,
-    spotify_id="123",
-    genre_name="HIPHOP",
-    timestamp="123456",
-    artists=[
-        ArtistCreate(name="kendrick lamar", spotify_id="123", genres=["west coast rap"])
-    ],
-)
 
 
 @pytest.fixture()
