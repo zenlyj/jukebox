@@ -6,7 +6,6 @@ from api.schemas.Preference import PreferenceCreate
 from api.repositories.PreferenceRepository import PreferenceRepository
 from api.repositories.SongRepository import SongRepository
 from api.services.PreferenceService import PreferenceService
-from api.services.SongService import SongService
 
 router = APIRouter()
 
