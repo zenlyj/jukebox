@@ -2,8 +2,11 @@ from fastapi.testclient import TestClient
 from fastapi import HTTPException
 import pytest
 from ..main import app
-from .mocks import song_out
 from .mocks import playlist_create
+from .mocks import get_songs_response
+from .mocks import get_playlist_size_response
+from .mocks import add_song_to_playlist_response
+from .mocks import delete_song_from_playlist_response
 
 client = TestClient(app)
 
@@ -12,7 +15,7 @@ client = TestClient(app)
 def mock_service_get_playlist_songs(mocker):
     mocker.patch(
         "api.services.PlaylistService.PlaylistService.get_playlist_songs",
-        return_value={"songs": [song_out], "song_count": 1},
+        return_value=get_songs_response,
     )
 
 
@@ -20,7 +23,7 @@ def mock_service_get_playlist_songs(mocker):
 def mock_service_get_playlist_size(mocker):
     mocker.patch(
         "api.services.PlaylistService.PlaylistService.get_playlist_size",
-        return_value={"size": 1, "message": "1 song in playlist"},
+        return_value=get_playlist_size_response,
     )
 
 
@@ -28,12 +31,7 @@ def mock_service_get_playlist_size(mocker):
 def mock_service_add_song_to_playlist(mocker):
     mocker.patch(
         "api.services.PlaylistService.PlaylistService.add_song_to_playlist",
-        return_value={
-            "id": 1,
-            "spotify_user_id": "123",
-            "song_id": 1,
-            "message": "Successfully added to playlist!",
-        },
+        return_value=add_song_to_playlist_response,
     )
 
 
@@ -51,7 +49,7 @@ def mock_service_add_duplicate_song_to_playlist(mocker):
 def mock_service_remove_song_from_playlist(mocker):
     mocker.patch(
         "api.services.PlaylistService.PlaylistService.remove_song_from_playlist",
-        return_value={"message": "Successfully deleted song 1 from playlist!"},
+        return_value=delete_song_from_playlist_response,
     )
 
 
@@ -65,9 +63,8 @@ def mock_service_remove_song_from_playlist_not_found(mocker):
 
 def test_get_playlist_songs_success(mock_service_get_playlist_songs):
     response = client.get("/playlist/?spotify_user_id=123&page_num=1&page_size=10")
-    expected_song = song_out.model_dump(mode="json")
     assert response.status_code == 200
-    assert response.json() == {"songs": [expected_song], "song_count": 1}
+    assert response.json() == get_songs_response
 
 
 def test_get_playlist_songs_missing_spotify_user_id_fail(
@@ -85,7 +82,7 @@ def test_get_playlist_songs_missing_pagination_fail(mock_service_get_playlist_so
 def test_get_playlist_size_success(mock_service_get_playlist_size):
     response = client.get("/playlist/size/?spotify_user_id=123")
     assert response.status_code == 200
-    assert response.json() == {"size": 1, "message": "1 song in playlist"}
+    assert response.json() == get_playlist_size_response
 
 
 def test_get_playlist_size_missing_spotify_user_id_fail(mock_service_get_playlist_size):
@@ -94,14 +91,9 @@ def test_get_playlist_size_missing_spotify_user_id_fail(mock_service_get_playlis
 
 
 def test_add_song_to_playlist_success(mock_service_add_song_to_playlist):
-    response = client.post("/playlist/", json=playlist_create.model_dump(mode="json"))
+    response = client.post("/playlist/", json=playlist_create)
     assert response.status_code == 200
-    assert response.json() == {
-        "id": 1,
-        "spotify_user_id": "123",
-        "song_id": 1,
-        "message": "Successfully added to playlist!",
-    }
+    assert response.json() == add_song_to_playlist_response
 
 
 def test_add_song_to_playlist_invalid_playlist_create_fail(
@@ -114,15 +106,15 @@ def test_add_song_to_playlist_invalid_playlist_create_fail(
 def test_add_song_to_playlist_duplicate_song_fail(
     mock_service_add_duplicate_song_to_playlist,
 ):
-    response = client.post("/playlist/", json=playlist_create.model_dump(mode="json"))
+    response = client.post("/playlist/", json=playlist_create)
     assert response.status_code == 422
     assert response.json()["detail"] == "Song already added to playlist!"
 
 
-def test_remove_song_from_playlist(mock_service_remove_song_from_playlist):
+def test_remove_song_from_playlist_success(mock_service_remove_song_from_playlist):
     response = client.delete("/playlist/?spotify_user_id=123&song_id=1")
     assert response.status_code == 200
-    assert response.json() == {"message": "Successfully deleted song 1 from playlist!"}
+    assert response.json() == delete_song_from_playlist_response
 
 
 def test_remove_song_from_playlist_missing_spotify_user_id_fail(
@@ -139,7 +131,7 @@ def test_remove_song_from_playlist_missing_song_id_fail(
     assert response.status_code == 422
 
 
-def test_remove_song_from_playlist_not_found(
+def test_remove_song_from_playlist_not_found_fail(
     mock_service_remove_song_from_playlist_not_found,
 ):
     response = client.delete("/playlist/?spotify_user_id=123&song_id=1")
