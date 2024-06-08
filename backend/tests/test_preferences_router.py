@@ -3,7 +3,7 @@ from fastapi import HTTPException
 import pytest
 from ..main import app
 from .mocks import preference_create
-
+from .mocks import add_user_preferences_response
 
 client = TestClient(app)
 
@@ -12,11 +12,7 @@ client = TestClient(app)
 def mock_service_create_preferences(mocker):
     mocker.patch(
         "api.services.PreferenceService.PreferenceService.create_preferences",
-        return_value={
-            "spotify_user_id": "123",
-            "artist_genre_ids": [1, 2, 3],
-            "message": "Successfully added user preferences!",
-        },
+        return_value=add_user_preferences_response,
     )
 
 
@@ -29,15 +25,9 @@ def mock_service_create_preferences_song_not_found(mocker):
 
 
 def test_add_user_preferences_success(mock_service_create_preferences):
-    response = client.post(
-        "/preference/", json=preference_create.model_dump(mode="json")
-    )
+    response = client.post("/preference/", json=preference_create)
     assert response.status_code == 200
-    assert response.json() == {
-        "spotify_user_id": "123",
-        "artist_genre_ids": [1, 2, 3],
-        "message": "Successfully added user preferences!",
-    }
+    assert response.json() == add_user_preferences_response
 
 
 def test_add_user_preferences_invalid_preferences_create_fail(
@@ -50,8 +40,6 @@ def test_add_user_preferences_invalid_preferences_create_fail(
 def test_add_user_preferences_song_not_found_fail(
     mock_service_create_preferences_song_not_found,
 ):
-    response = client.post(
-        "/preference/", json=preference_create.model_dump(mode="json")
-    )
+    response = client.post("/preference/", json=preference_create)
     assert response.status_code == 400
     assert response.json()["detail"] == "No such song!"
