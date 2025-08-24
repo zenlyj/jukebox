@@ -2,9 +2,9 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from api.database import get_db
 from api.schemas.Playlist import PlaylistCreate
-from api.repositories.PlaylistRepository import PlaylistRepository
-from api.services.PlaylistService import PlaylistService
-from api.services.SongService import SongService
+from api.repositories import PlaylistRepository
+from api.services import PlaylistService
+from api.services import SongService
 from api.responses.SongResponse import GetSongsResponse
 from api.responses.PlaylistResponse import AddSongToPlaylistResponse
 from api.responses.PlaylistResponse import DeleteSongFromPlaylistResponse

@@ -1,11 +1,11 @@
 from fastapi.testclient import TestClient
-from fastapi import HTTPException
 import pytest
 from ..main import app
 from .mocks import song_out
 from .mocks import song_create
 from .mocks import get_songs_response
 from .mocks import create_song_response
+from api.exceptions import ResourceAlreadyExists
 
 
 client = TestClient(app)
@@ -39,7 +39,7 @@ def mock_service_add_song(mocker):
 def mock_service_add_duplicate_song(mocker):
     mocker.patch(
         "api.services.SongService.SongService.add_song",
-        side_effect=HTTPException(status_code=422, detail="Song already created!"),
+        side_effect=ResourceAlreadyExists("Song"),
     )
 
 
@@ -103,5 +103,5 @@ def test_add_song_invalid_song_create_fail(mock_service_add_song):
 
 def test_add_song_duplicate_song_fail(mock_service_add_duplicate_song):
     response = client.post("/songs/", json=song_create)
-    assert response.status_code == 422
-    assert response.json()["detail"] == "Song already created!"
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Song already exists"

@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from api.database import get_db
 from api.responses.PreferenceResponse import AddUserPreferencesResponse
 from api.schemas.Preference import PreferenceCreate
-from api.repositories.PreferenceRepository import PreferenceRepository
-from api.repositories.SongRepository import SongRepository
-from api.services.PreferenceService import PreferenceService
+from api.repositories import PreferenceRepository
+from api.repositories import SongRepository
+from api.services import PreferenceService
 
 router = APIRouter()
 

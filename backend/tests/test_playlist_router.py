@@ -1,5 +1,4 @@
 from fastapi.testclient import TestClient
-from fastapi import HTTPException
 import pytest
 from ..main import app
 from .mocks import playlist_create
@@ -7,6 +6,8 @@ from .mocks import get_songs_response
 from .mocks import get_playlist_size_response
 from .mocks import add_song_to_playlist_response
 from .mocks import delete_song_from_playlist_response
+from api.exceptions import ResourceAlreadyExists
+from api.exceptions import ResourceNotFound
 
 client = TestClient(app)
 
@@ -39,9 +40,7 @@ def mock_service_add_song_to_playlist(mocker):
 def mock_service_add_duplicate_song_to_playlist(mocker):
     mocker.patch(
         "api.services.PlaylistService.PlaylistService.add_song_to_playlist",
-        side_effect=HTTPException(
-            status_code=422, detail="Song already added to playlist!"
-        ),
+        side_effect=ResourceAlreadyExists("Playlist song"),
     )
 
 
@@ -57,7 +56,7 @@ def mock_service_remove_song_from_playlist(mocker):
 def mock_service_remove_song_from_playlist_not_found(mocker):
     mocker.patch(
         "api.services.PlaylistService.PlaylistService.remove_song_from_playlist",
-        side_effect=HTTPException(status_code=422, detail="Failed to delete song"),
+        side_effect=ResourceNotFound("Playlist song"),
     )
 
 
@@ -107,8 +106,8 @@ def test_add_song_to_playlist_duplicate_song_fail(
     mock_service_add_duplicate_song_to_playlist,
 ):
     response = client.post("/playlist/", json=playlist_create)
-    assert response.status_code == 422
-    assert response.json()["detail"] == "Song already added to playlist!"
+    assert response.status_code == 409
+    assert response.json()["detail"] == "Playlist song already exists"
 
 
 def test_remove_song_from_playlist_success(mock_service_remove_song_from_playlist):
@@ -135,5 +134,5 @@ def test_remove_song_from_playlist_not_found_fail(
     mock_service_remove_song_from_playlist_not_found,
 ):
     response = client.delete("/playlist/?spotify_user_id=123&song_id=1")
-    assert response.status_code == 422
-    assert response.json()["detail"] == "Failed to delete song"
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Playlist song not found"

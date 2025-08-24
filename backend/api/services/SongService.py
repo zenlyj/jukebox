@@ -1,15 +1,15 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Tuple
-from api.repositories.SongRepository import SongRepository
-from api.repositories.PreferenceRepository import PreferenceRepository
+from api.repositories import SongRepository
+from api.repositories import PreferenceRepository
 from api.responses.SongResponse import GetSongsResponse
 from api.responses.SongResponse import CreateSongResponse
 from api.schemas import Song as song_schemas
-from api.models.Song import Song
-from api.models.Artist import Artist
-from api.models.ArtistGenre import ArtistGenre
+from api.models import Song
+from api.models import Artist
+from api.models import ArtistGenre
 from api.tools.algorithms import preference_score
+from api.exceptions import ResourceAlreadyExists
 
 
 class SongService:
@@ -70,7 +70,7 @@ class SongService:
         self, db: Session, song_repo: SongRepository, song: song_schemas.SongCreate
     ) -> CreateSongResponse:
         if song_repo.is_song_exist(db, song.spotify_id):
-            raise HTTPException(status_code=422, detail="Song already created!")
+            raise ResourceAlreadyExists("Song")
         new_song = Song(
             name=song.name,
             uri=song.uri,

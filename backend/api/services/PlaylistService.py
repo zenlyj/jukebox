@@ -1,16 +1,17 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
-from api.services.SongService import SongService
-from api.models.Playlist import Playlist
+from api.services import SongService
+from api.models import Playlist
 from api.schemas.Playlist import PlaylistCreate
 from api.schemas import Song as song_schemas
 from api.schemas import Playlist as playlist_schemas
-from api.repositories.PlaylistRepository import PlaylistRepository
+from api.repositories import PlaylistRepository
 from api.responses.SongResponse import GetSongsResponse
 from api.responses.PlaylistResponse import AddSongToPlaylistResponse
 from api.responses.PlaylistResponse import DeleteSongFromPlaylistResponse
 from api.responses.PlaylistResponse import GetPlaylistSizeResponse
+from api.exceptions.ResourceAlreadyExists import ResourceAlreadyExists
+from api.exceptions import ResourceNotFound
 
 
 class PlaylistService:
@@ -40,9 +41,7 @@ class PlaylistService:
         self, db: Session, playlist_repo: PlaylistRepository, playlist: PlaylistCreate
     ) -> AddSongToPlaylistResponse:
         if playlist_repo.is_song_exist(db, playlist.spotify_user_id, playlist.song_id):
-            raise HTTPException(
-                status_code=422, detail="Song already added to playlist!"
-            )
+            raise ResourceAlreadyExists("Playlist song")
         new_playlist_song = Playlist(
             spotify_user_id=playlist.spotify_user_id, song_id=playlist.song_id
         )
@@ -65,7 +64,7 @@ class PlaylistService:
             db, spotify_user_id, song_id
         )
         if num_deleted == 0:
-            raise HTTPException(status_code=422, detail="Failed to delete song")
+            raise ResourceNotFound("Playlist song")
         return self._to_delete_song_from_playlist_response(song_id)
 
     def _to_add_song_to_playlist_response(

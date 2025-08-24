@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 from dotenv import load_dotenv
 import requests
 from requests.models import Response
@@ -12,6 +11,8 @@ from api.responses.SpotifyResponse import SearchSpotifyResponse
 from api.responses.SpotifyResponse import SpotifyUserProfileResponse
 from api.responses.SpotifyResponse import SpotifyArtistResponse
 from api.tools.SpotifyParser import SpotifyParser
+from api.exceptions import DomainException
+from api.exceptions import ResourceNotFound
 
 load_dotenv()
 CLIENT_URL = os.getenv("CLIENT_URL")
@@ -73,16 +74,16 @@ class SpotifyService:
         )
         if response.status_code != 200:
             error_message = json.loads(response.text)["error"]["message"]
-            raise HTTPException(status_code=response.status_code, detail=error_message)
+            raise DomainException(
+                status_code=response.status_code, detail=error_message
+            )
         response_data = spotify_parser.parse_spotify_search(response.text, query)
         if not response_data:
-            raise HTTPException(status_code=404, detail="Track not found on Spotify")
+            raise ResourceNotFound("Spotify track")
         name, artists_data, uri, album_cover, duration, spotify_id = response_data
         artists_spotify_id = [artist_data[1] for artist_data in artists_data]
         if any(not val for val in response_data):
-            raise HTTPException(
-                status_code=404, detail="Some track data is unavailable"
-            )
+            raise ResourceNotFound("Spotify track data")
         return self._to_search_spotify_response(
             name, artists_spotify_id, uri, album_cover, duration, spotify_id
         )
@@ -91,7 +92,9 @@ class SpotifyService:
         response = requests.get(USER_ENDPOINT, headers=self._user_headers(access_token))
         if response.status_code != 200:
             error_message = json.loads(response.text)["error"]["message"]
-            raise HTTPException(status_code=response.status_code, detail=error_message)
+            raise DomainException(
+                status_code=response.status_code, detail=error_message
+            )
         response_data = json.loads(response.text)
         name, user_id = response_data["display_name"], response_data["id"]
         return self._to_spotify_user_profile_response(name, user_id)
@@ -105,7 +108,9 @@ class SpotifyService:
             headers=self._artist_headers(access_token),
         )
         if response.status_code != 200:
-            raise HTTPException(status_code=response.status_code, detail=response.text)
+            raise DomainException(
+                status_code=response.status_code, detail=response.text
+            )
         response_data = spotify_parser.parse_spotify_artists(response.text)
         return [
             self._to_spotify_artist_response(name, genres, id)
@@ -149,7 +154,7 @@ class SpotifyService:
 
     def _handle_token_error(self, response: Response) -> None:
         error_message = json.loads(response.text)["error_description"]
-        raise HTTPException(status_code=response.status_code, detail=error_message)
+        raise DomainException(status_code=response.status_code, detail=error_message)
 
     def _user_headers(self, access_token: str) -> dict:
         return {"Authorization": f"Bearer {access_token}"}

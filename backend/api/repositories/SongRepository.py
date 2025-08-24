@@ -1,8 +1,8 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
-from api.models.Song import Song
-from api.models.Artist import Artist
-from api.models.ArtistGenre import ArtistGenre
+from api.models import Song
+from api.models import Artist
+from api.models import ArtistGenre
 from api.tools.DataTypes import Genre
 
 from typing import List

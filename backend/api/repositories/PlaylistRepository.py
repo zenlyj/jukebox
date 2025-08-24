@@ -1,9 +1,9 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
-from api.models.Song import Song
-from api.models.Artist import Artist
-from api.models.Playlist import Playlist
+from api.models import Song
+from api.models import Artist
+from api.models import Playlist
 
 from typing import List
 from typing import Set

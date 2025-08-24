@@ -1,5 +1,4 @@
 from fastapi.testclient import TestClient
-from fastapi import HTTPException
 import pytest
 from ..main import app
 from .mocks import authorization_create
@@ -8,6 +7,8 @@ from .mocks import spotify_authorization_response
 from .mocks import search_spotify_response
 from .mocks import spotify_user_profile_response
 from .mocks import spotify_artist_response
+from api.exceptions import DomainException
+from api.exceptions import ResourceNotFound
 
 client = TestClient(app)
 
@@ -32,7 +33,7 @@ def mock_service_refresh_token(mocker):
 def mock_service_create_token_unauthorized(mocker):
     mocker.patch(
         "api.services.SpotifyService.SpotifyService.create_token",
-        side_effect=HTTPException(
+        side_effect=DomainException(
             status_code=401, detail="Unauthorized to create Spotify token!"
         ),
     )
@@ -42,7 +43,7 @@ def mock_service_create_token_unauthorized(mocker):
 def mock_service_refresh_token_unauthorized(mocker):
     mocker.patch(
         "api.services.SpotifyService.SpotifyService.refresh_token",
-        side_effect=HTTPException(
+        side_effect=DomainException(
             status_code=401, detail="Unauthorized to refresh Spotify token!"
         ),
     )
@@ -60,7 +61,7 @@ def mock_service_search_spotify(mocker):
 def mock_service_search_spotify_not_found(mocker):
     mocker.patch(
         "api.services.SpotifyService.SpotifyService.search",
-        side_effect=HTTPException(status_code=404, detail="Track not found on Spotify"),
+        side_effect=ResourceNotFound("Spotify track"),
     )
 
 
@@ -76,7 +77,7 @@ def mock_service_get_user_profile_info(mocker):
 def mock_service_get_user_profile_info_unauthorized(mocker):
     mocker.patch(
         "api.services.SpotifyService.SpotifyService.get_user_profile_info",
-        side_effect=HTTPException(
+        side_effect=DomainException(
             status_code=401, detail="Unauthorized to get user profile"
         ),
     )
@@ -94,7 +95,7 @@ def mock_service_get_artists(mocker):
 def mock_service_get_artists_unauthorized(mocker):
     mocker.patch(
         "api.services.SpotifyService.SpotifyService.get_artists",
-        side_effect=HTTPException(
+        side_effect=DomainException(
             status_code=401, detail="Unauthorized to get artists"
         ),
     )
@@ -170,7 +171,7 @@ def test_search_spotify_not_found_fail(mock_service_search_spotify_not_found):
         headers={"Authorization": "Bearer a23fa1"},
     )
     assert response.status_code == 404
-    assert response.json()["detail"] == "Track not found on Spotify"
+    assert response.json()["detail"] == "Spotify track not found"
 
 
 def test_get_user_profile_success(mock_service_get_user_profile_info):

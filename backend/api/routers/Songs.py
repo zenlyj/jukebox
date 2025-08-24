@@ -2,9 +2,9 @@ from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from api.database import get_db
 from api.schemas.Song import SongCreate
-from api.repositories.SongRepository import SongRepository
-from api.repositories.PreferenceRepository import PreferenceRepository
-from api.services.SongService import SongService
+from api.repositories import SongRepository
+from api.repositories import PreferenceRepository
+from api.services import SongService
 from api.responses.SongResponse import GetSongsResponse
 from api.responses.SongResponse import CreateSongResponse
 

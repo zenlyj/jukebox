@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, Header
 from typing import Union, List
 from typing_extensions import Annotated
 
-from api.services.SpotifyService import SpotifyService
+from api.services import SpotifyService
 from api.tools.SpotifyParser import SpotifyParser
 
 from api.responses.SpotifyResponse import SpotifyAuthorizationResponse
@@ -12,6 +12,8 @@ from api.responses.SpotifyResponse import SpotifyArtistResponse
 
 from api.schemas.Authorization import AuthorizationCreate
 from api.schemas.Authorization import AuthorizationRefresh
+
+from api.exceptions.DomainException import DomainException
 
 router = APIRouter()
 
@@ -26,7 +28,7 @@ def authorize_spotify(
     elif data.grant_type == "refresh_token":
         return spotify_service.refresh_token(data.refresh_token)
     else:
-        raise HTTPException(status_code=400, detail="Invalid grant type")
+        raise DomainException(status_code=400, detail="Invalid grant type")
 
 
 @router.get("/spotify/track/", response_model=SearchSpotifyResponse)

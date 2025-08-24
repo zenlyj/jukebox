@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from typing import List
 
-from api.models.Preference import Preference
+from api.models import Preference
 
 
 class PreferenceRepository:

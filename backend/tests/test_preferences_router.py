@@ -1,9 +1,9 @@
 from fastapi.testclient import TestClient
-from fastapi import HTTPException
 import pytest
 from ..main import app
 from .mocks import preference_create
 from .mocks import add_user_preferences_response
+from api.exceptions import ResourceNotFound
 
 client = TestClient(app)
 
@@ -20,7 +20,7 @@ def mock_service_create_preferences(mocker):
 def mock_service_create_preferences_song_not_found(mocker):
     mocker.patch(
         "api.services.PreferenceService.PreferenceService.create_preferences",
-        side_effect=HTTPException(status_code=400, detail="No such song!"),
+        side_effect=ResourceNotFound("Preferred song"),
     )
 
 
@@ -41,5 +41,5 @@ def test_add_user_preferences_song_not_found_fail(
     mock_service_create_preferences_song_not_found,
 ):
     response = client.post("/preference/", json=preference_create)
-    assert response.status_code == 400
-    assert response.json()["detail"] == "No such song!"
+    assert response.status_code == 404
+    assert response.json()["detail"] == "Preferred song not found"

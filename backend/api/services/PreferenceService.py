@@ -1,12 +1,12 @@
-from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
-from api.repositories.PreferenceRepository import PreferenceRepository
-from api.repositories.SongRepository import SongRepository
-from api.models.Preference import Preference
+from api.repositories import PreferenceRepository
+from api.repositories import SongRepository
+from api.models import Preference
 from api.schemas import Preference as preference_schemas
 from api.responses.PreferenceResponse import AddUserPreferencesResponse
 from api.responses.PreferenceResponse import GetUserPreferencesResponse
+from api.exceptions import ResourceNotFound
 
 
 class PreferenceService:
@@ -20,7 +20,7 @@ class PreferenceService:
         try:
             song = song_repo.get_song(db, preference.song_id)
         except NoResultFound:
-            raise HTTPException(status_code=400, detail="No such song!")
+            raise ResourceNotFound("Preferred song")
 
         spotify_user_id = preference.spotify_user_id
         curr_preferences = set(
